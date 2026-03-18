@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dashboard</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial;
+            background: #0f172a;
+            color: white;
+        }
+
+        .navbar {
+            background: #1e293b;
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .logo {
+            font-weight: bold;
+            color: #38bdf8;
+        }
+
+        .logout {
+            color: #f87171;
+            text-decoration: none;
+        }
+
+        .container {
+            padding: 40px;
+        }
+
+        .card {
+            background: #1e293b;
+            padding: 20px;
+            border-radius: 10px;
+            width: 300px;
+        }
+
+        .username {
+            color: #38bdf8;
+        }
+    </style>
+</head>
+<body>
+
+<div class="navbar">
+    <div class="logo">0T0M8 MW</div>
+    <a class="logout" href="/accounts/logout/">Logout</a>
+</div>
+
+<div class="container">
+    <h1>Welcome, <span class="username">{{ request.user.username }}</span> 👋</h1>
+
+    <div class="card">
+        <h3>Dashboard</h3>
+        <p>You are successfully logged in.</p>
+    </div>
+</div>
+
+</body>
+</html>
