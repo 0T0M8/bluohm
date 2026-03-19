@@ -38,7 +38,7 @@ def login_view(request):
 
         if user is not None:
             login(request, user)
-            return redirect("/dashboard/")  # go home after login
+            return redirect("marketplace")  # go home after login
         else:
             from django.contrib import messages
             messages.error(request, "Invalid username or password")
