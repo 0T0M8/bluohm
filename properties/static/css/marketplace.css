@@ -1,0 +1,140 @@
+/* 🎯 Design Tokens */
+:root {
+    --bg: #f8fafc;
+    --card: #ffffff;
+    --primary: #2563eb;
+    --text: #0f172a;
+    --muted: #64748b;
+    --radius: 14px;
+}
+
+/* 🌍 Base */
+body {
+    margin: 0;
+    font-family: system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+}
+
+/* 🔵 Navbar */
+.navbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 18px;
+    background: white;
+    border-bottom: 1px solid #e5e7eb;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.logo {
+    font-weight: 600;
+}
+
+.menu-btn {
+    font-size: 22px;
+    cursor: pointer;
+}
+
+/* 🟣 Sidebar */
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: -260px;
+    width: 240px;
+    height: 100%;
+    background: white;
+    padding-top: 70px;
+    transition: 0.25s ease;
+    box-shadow: 4px 0 20px rgba(0,0,0,0.08);
+}
+
+.sidebar a {
+    display: block;
+    padding: 14px 20px;
+    text-decoration: none;
+    color: var(--text);
+    font-weight: 500;
+}
+
+.sidebar a:hover {
+    background: #f1f5f9;
+}
+
+.sidebar.active {
+    left: 0;
+}
+
+/* 🟢 Content */
+.main-content {
+    padding: 16px;
+}
+
+/* 📱 Horizontal row */
+.property-row {
+    display: flex;
+    overflow-x: auto;
+    gap: 16px;
+    padding-bottom: 10px;
+}
+
+/* 📦 Card */
+.property-card {
+    min-width: 260px;
+    background: var(--card);
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+    transition: transform 0.2s ease;
+}
+
+.property-card:hover {
+    transform: translateY(-4px);
+}
+
+/* 🖼 Image */
+.property-card img {
+    width: 100%;
+    height: 170px;
+    object-fit: cover;
+}
+
+/* 📄 Content */
+.property-card .content {
+    padding: 14px;
+}
+
+.property-card h3 {
+    margin: 0;
+    font-size: 1rem;
+}
+
+.property-card p {
+    margin: 6px 0;
+    font-size: 0.85rem;
+    color: var(--muted);
+}
+
+.price {
+    font-weight: 600;
+    color: var(--primary);
+}
+
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.2);
+    opacity: 0;
+    pointer-events: none;
+    transition: 0.2s;
+}
+
+.overlay.active {
+    opacity: 1;
+    pointer-events: all;
+}

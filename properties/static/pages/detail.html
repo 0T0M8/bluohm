@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<h2>{{ property.title }}</h2>
+
+<img src="{{ property.image.url }}" style="width:100%; border-radius:12px;">
+
+<p>{{ property.description }}</p>
+<p class="price">MWK {{ property.price }}</p>
+
+{% endblock %}

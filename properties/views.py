@@ -5,6 +5,7 @@ from django.shortcuts import render, redirect
 from .forms import PropertyForm
 from .models import Property
 from django.contrib.auth.decorators import login_required
+from django.shortcuts import render, get_object_or_404
 
 @login_required
 def add_property(request):
@@ -23,3 +24,7 @@ def add_property(request):
 def marketplace(request):
     properties = Property.objects.all().order_by('-created_at')
     return render(request, 'properties/marketplace.html', {'properties': properties})
+
+def property_detail(request, id):
+    property = get_object_or_404(Property, id=id)
+    return render(request, 'properties/detail.html', {'property': property})
