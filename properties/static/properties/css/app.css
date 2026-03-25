@@ -1,0 +1,194 @@
+:root{
+--bg:#f8fafc;
+--card:#fff;
+--text:#0f172a;
+--muted:#64748b;
+--primary:#2563eb;
+}
+
+body.dark{
+--bg:#0f172a;
+--card:#1e293b;
+--text:#f1f5f9;
+--muted:#94a3b8;
+}
+
+body{
+margin:0;
+font-family:system-ui;
+background:var(--bg);
+color:var(--text);
+}
+
+/* Navbar */
+
+.navbar{
+position:sticky;
+top:0;
+display:flex;
+justify-content:space-between;
+padding:14px;
+background:var(--card);
+z-index:20;
+}
+
+/* Sidebar */
+
+.sidebar{
+position:fixed;
+left:-250px;
+top:0;
+width:220px;
+height:100%;
+background:var(--card);
+padding-top:60px;
+transition:.3s;
+z-index:30;
+}
+
+.sidebar.active{
+left:0;
+}
+
+.overlay{
+position:fixed;
+inset:0;
+background:rgba(0,0,0,.3);
+opacity:0;
+pointer-events:none;
+z-index:25;
+}
+
+.overlay.active{
+opacity:1;
+pointer-events:all;
+}
+
+/* Search */
+
+.search-container{
+padding:10px;
+}
+
+.search-box{
+background:var(--card);
+padding:10px;
+border-radius:12px;
+}
+
+.search-box input{
+width:100%;
+border:none;
+outline:none;
+background:transparent;
+}
+
+/* Cards */
+
+.property-row{
+display:flex;
+overflow-x:auto;
+gap:15px;
+padding:10px;
+}
+
+.property-card{
+min-width:260px;
+border-radius:16px;
+overflow:hidden;
+background:var(--card);
+cursor:pointer;
+transition:.2s;
+}
+
+.property-card:active{
+transform:scale(.96);
+}
+
+.property-card img{
+width:100%;
+height:180px;
+object-fit:cover;
+}
+
+.property-info{
+padding:10px;
+}
+
+.price{
+color:var(--primary);
+font-weight:bold;
+}
+
+/* FAB */
+
+.fab{
+position:fixed;
+bottom:80px;
+right:20px;
+width:60px;
+height:60px;
+background:var(--primary);
+color:white;
+display:flex;
+align-items:center;
+justify-content:center;
+border-radius:50%;
+font-size:30px;
+box-shadow:0 10px 20px rgba(0,0,0,.2);
+}
+
+/* Bottom Nav */
+
+.bottom-nav{
+position:fixed;
+bottom:0;
+width:100%;
+background:var(--card);
+display:flex;
+justify-content:space-around;
+padding:10px 0;
+}
+
+.bottom-nav a{
+text-decoration:none;
+color:var(--muted);
+}
+
+.bottom-nav a.active{
+color:var(--primary);
+}
+
+/* Modal */
+
+.modal{
+display:none;
+position:fixed;
+inset:0;
+background:var(--bg);
+z-index:50;
+animation:fade .2s ease;
+}
+
+@keyframes fade{
+from{opacity:0}
+to{opacity:1}
+}
+
+/* Skeleton */
+
+.skeleton{
+height:200px;
+background:linear-gradient(
+90deg,
+#eee,
+#ddd,
+#eee
+);
+animation:load 1s infinite;
+}
+
+@keyframes load{
+0%{background-position:-200px}
+100%{background-position:200px}
+}

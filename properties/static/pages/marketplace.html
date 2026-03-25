@@ -3,67 +3,90 @@
 {% block content %}
 
 <div class="search-container">
-    <form method="GET" class="search-box">
-        <input type="text" name="q" placeholder="Search houses...">
-    </form>
+<form method="GET" class="search-box">
+<input type="text" name="q" placeholder="Search properties...">
+</form>
 </div>
 
-<div style="padding:0 16px;">
-    <h3>Explore</h3>
-</div>
+{% if properties %}
 
 <div class="property-row">
-    {% for property in properties %}
-    <div class="property-card"
-    onclick="openModal('{{ property.image.url }}','{{ property.title }}','{{ property.description }}','MWK {{ property.price }}')">
-        
-        <img src="{{ property.image.url }}">
-        
-        <div class="property-info">
-            <h4>{{ property.title }}</h4>
-            <p class="price">MWK {{ property.price }}</p>
-        </div>
 
-    </div>
-    {% endfor %}
+{% for property in properties %}
+
+<div class="property-card"
+onclick="openModal('{{property.image.url}}','{{property.title}}','{{property.description}}','MWK {{property.price}}')">
+
+<img src="{{property.image.url}}" loading="lazy">
+
+<div class="property-info">
+<h3>{{property.title}}</h3>
+<p class="price">MWK {{property.price}}</p>
 </div>
+
+</div>
+
+{% endfor %}
+
+</div>
+
+{% else %}
+
+<div style="padding:20px;text-align:center;">
+<h3>No properties yet</h3>
+<p>Start by adding your first listing</p>
+</div>
+
+{% endif %}
 
 {% if user.role == 'landlord' %}
 <a href="/properties/add/" class="fab">+</a>
 {% endif %}
 
-<!-- MODAL -->
+<!-- Modal -->
+
 <div id="modal" class="modal">
-    <img id="modal-img">
-    <div class="modal-content">
-        <h2 id="modal-title"></h2>
-        <p id="modal-desc"></p>
-        <p class="price" id="modal-price"></p>
-        <button onclick="closeModal()">Close</button>
-    </div>
+
+<img id="modal-img">
+
+<div style="padding:15px;">
+<h2 id="modal-title"></h2>
+<p id="modal-desc"></p>
+<p class="price" id="modal-price"></p>
+
+<button onclick="closeModal()">Close</button>
+
 </div>
 
-<!-- Bottom Nav -->
+</div>
+
+<!-- Bottom nav -->
+
 <div class="bottom-nav">
-    <a href="/properties/">🏠 Home</a>
-    <a href="#">🔍 Search</a>
-    <a href="#">👤 Profile</a>
+<a href="/properties/" class="active">🏠</a>
+<a href="#">🔍</a>
+<a href="#">👤</a>
 </div>
 
 <script>
-function openModal(img, title, desc, price){
-    modal.style.display = 'block';
-    document.getElementById('modal-img').src = img;
-    document.getElementById('modal-title').innerText = title;
-    document.getElementById('modal-desc').innerText = desc;
-    document.getElementById('modal-price').innerText = price;
+
+const modal=document.getElementById("modal")
+
+function openModal(img,title,desc,price){
+
+modal.style.display="block"
+
+document.getElementById("modal-img").src=img
+document.getElementById("modal-title").innerText=title
+document.getElementById("modal-desc").innerText=desc
+document.getElementById("modal-price").innerText=price
+
 }
 
 function closeModal(){
-    modal.style.display = 'none';
+modal.style.display="none"
 }
 
-const modal = document.getElementById('modal');
 </script>
 
 {% endblock %}

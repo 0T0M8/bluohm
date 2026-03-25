@@ -1,17 +1,92 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h2>Marketplace</h2>
-<div class="property-grid">
-    {% for property in properties %}
-        <div class="property-card">
-            <img src="{{ property.image.url }}" alt="{{ property.title }}" />
-            <h3>{{ property.title }}</h3>
-            <p>{{ property.description }}</p>
-            <p>Price: ${{ property.price }}</p>
-        </div>
-    {% empty %}
-        <p>No properties yet.</p>
-    {% endfor %}
+
+<div class="search-container">
+<form method="GET" class="search-box">
+<input type="text" name="q" placeholder="Search properties...">
+</form>
 </div>
+
+{% if properties %}
+
+<div class="property-row">
+
+{% for property in properties %}
+
+<div class="property-card"
+onclick="openModal('{{property.image.url}}','{{property.title}}','{{property.description}}','MWK {{property.price}}')">
+
+<img src="{{property.image.url}}" loading="lazy">
+
+<div class="property-info">
+<h3>{{property.title}}</h3>
+<p class="price">MWK {{property.price}}</p>
+</div>
+
+</div>
+
+{% endfor %}
+
+</div>
+
+{% else %}
+
+<div style="padding:20px;text-align:center;">
+<h3>No properties yet</h3>
+<p>Start by adding your first listing</p>
+</div>
+
+{% endif %}
+
+{% if user.role == 'landlord' %}
+<a href="/properties/add/" class="fab">+</a>
+{% endif %}
+
+<!-- Modal -->
+
+<div id="modal" class="modal">
+
+<img id="modal-img">
+
+<div style="padding:15px;">
+<h2 id="modal-title"></h2>
+<p id="modal-desc"></p>
+<p class="price" id="modal-price"></p>
+
+<button onclick="closeModal()">Close</button>
+
+</div>
+
+</div>
+
+<!-- Bottom nav -->
+
+<div class="bottom-nav">
+<a href="/properties/" class="active">🏠</a>
+<a href="#">🔍</a>
+<a href="#">👤</a>
+</div>
+
+<script>
+
+const modal=document.getElementById("modal")
+
+function openModal(img,title,desc,price){
+
+modal.style.display="block"
+
+document.getElementById("modal-img").src=img
+document.getElementById("modal-title").innerText=title
+document.getElementById("modal-desc").innerText=desc
+document.getElementById("modal-price").innerText=price
+
+}
+
+function closeModal(){
+modal.style.display="none"
+}
+
+</script>
+
 {% endblock %}
