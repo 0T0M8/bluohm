@@ -1,35 +1,48 @@
-// Dark mode toggle
-const darkToggle = document.getElementById('dark-toggle');
-if(darkToggle){
-    darkToggle.addEventListener('click', () => {
-        document.body.classList.toggle('dark');
-    });
-}
+// 🟦 marketplace.js
 
-// Modal
+// Modal Elements
 const modal = document.getElementById('modal');
-const modalImages = document.getElementById('modal-images');
+const modalImg = document.getElementById('modal-img');
 const modalTitle = document.getElementById('modal-title');
 const modalDesc = document.getElementById('modal-desc');
 const modalPrice = document.getElementById('modal-price');
 
-function openModal(propertyId){
-    fetch(`/api/properties/${propertyId}/`)  // optionally create a simple JSON endpoint
-        .then(res => res.json())
-        .then(data => {
-            modalImages.innerHTML = '';
-            data.images.forEach(img => {
-                const el = document.createElement('img');
-                el.src = img.url;
-                modalImages.appendChild(el);
-            });
-            modalTitle.innerText = data.title;
-            modalDesc.innerText = data.description;
-            modalPrice.innerText = `MWK ${data.price}`;
-            modal.style.display = 'block';
-        });
+// Open Modal function
+function openModal(propertyId) {
+    // Fetch property data from a JSON endpoint or embedded data
+    // For now, let's use embedded data attributes in your template
+    const card = document.querySelector(`.property-card[onclick="openModal(${propertyId})"]`);
+
+    if (!card) return;
+
+    // Extract data attributes or inner info
+    const title = card.querySelector('.property-info h4').innerText;
+    const price = card.querySelector('.price').innerText;
+    
+    // Optional: description if you embed it in a hidden span
+    const descSpan = card.querySelector('.property-info .desc');
+    const desc = descSpan ? descSpan.innerText : '';
+
+    const img = card.querySelector('img').src;
+
+    // Fill modal content
+    modalImg.src = img;
+    modalTitle.innerText = title;
+    modalPrice.innerText = price;
+    modalDesc.innerText = desc;
+
+    // Show modal
+    modal.style.display = 'block';
 }
 
-function closeModal(){
+// Close Modal function
+function closeModal() {
     modal.style.display = 'none';
+}
+
+// Optional: close modal when clicking outside content
+window.onclick = function(event) {
+    if (event.target === modal) {
+        closeModal();
+    }
 }
