@@ -1,92 +1,62 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block content %}
 
+<!-- 🔍 Search Bar -->
 <div class="search-container">
-<form method="GET" class="search-box">
-<input type="text" name="q" placeholder="Search properties...">
-</form>
+    <form method="GET" class="search-box">
+        <input type="text" name="q" placeholder="Search houses...">
+    </form>
 </div>
 
-{% if properties %}
+<!-- 🏘️ Marketplace Heading -->
+<div style="padding:0 16px;">
+    <h3>Explore</h3>
+</div>
 
+<!-- 📦 Property Row -->
 <div class="property-row">
-
-{% for property in properties %}
-
-<div class="property-card"
-onclick="openModal('{{property.image.url}}','{{property.title}}','{{property.description}}','MWK {{property.price}}')">
-
-<img src="{{property.image.url}}" loading="lazy">
-
-<div class="property-info">
-<h3>{{property.title}}</h3>
-<p class="price">MWK {{property.price}}</p>
+    {% for property in properties %}
+    <div class="property-card" onclick="openModal({{ property.id }})">
+        {% if property.image %}
+            <img src="{{ property.image.url }}">
+        {% else %}
+            <img src="{% static 'properties/css/placeholder.png' %}">
+        {% endif %}
+        
+        <div class="property-info">
+            <h4>{{ property.title }}</h4>
+            <p class="price">MWK {{ property.price }}</p>
+        </div>
+    </div>
+    {% endfor %}
 </div>
 
-</div>
-
-{% endfor %}
-
-</div>
-
-{% else %}
-
-<div style="padding:20px;text-align:center;">
-<h3>No properties yet</h3>
-<p>Start by adding your first listing</p>
-</div>
-
+<!-- ➕ Floating Action Button (Landlords Only) -->
+{% if user.is_authenticated and user.profile.role == 'landlord' %}
+<a href="{% url 'properties:add_property' %}" class="fab">+</a>
 {% endif %}
 
-{% if user.role == 'landlord' %}
-<a href="/properties/add/" class="fab">+</a>
-{% endif %}
-
-<!-- Modal -->
-
+<!-- 🧾 Modal -->
 <div id="modal" class="modal">
-
-<img id="modal-img">
-
-<div style="padding:15px;">
-<h2 id="modal-title"></h2>
-<p id="modal-desc"></p>
-<p class="price" id="modal-price"></p>
-
-<button onclick="closeModal()">Close</button>
-
+    <img id="modal-img">
+    <div class="modal-content">
+        <h2 id="modal-title"></h2>
+        <p id="modal-desc"></p>
+        <p class="price" id="modal-price"></p>
+        <button onclick="closeModal()">Close</button>
+    </div>
 </div>
 
-</div>
-
-<!-- Bottom nav -->
-
+<!-- 📱 Bottom Navigation -->
 <div class="bottom-nav">
-<a href="/properties/" class="active">🏠</a>
-<a href="#">🔍</a>
-<a href="#">👤</a>
+    <a href="{% url 'properties:marketplace' %}">🏠 Home</a>
+    <a href="#">🔍 Search</a>
+    <a href="#">👤 Profile</a>
 </div>
 
-<script>
-
-const modal=document.getElementById("modal")
-
-function openModal(img,title,desc,price){
-
-modal.style.display="block"
-
-document.getElementById("modal-img").src=img
-document.getElementById("modal-title").innerText=title
-document.getElementById("modal-desc").innerText=desc
-document.getElementById("modal-price").innerText=price
-
-}
-
-function closeModal(){
-modal.style.display="none"
-}
-
-</script>
+<!-- 🟦 Marketplace JS -->
+<script src="{% static 'properties/js/marketplace.js' %}"></script>
 
 {% endblock %}

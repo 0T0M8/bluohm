@@ -160,16 +160,9 @@ color:var(--primary);
 }
 
 /* Modal */
-
-.modal{
-display:none;
-position:fixed;
-inset:0;
-background:var(--bg);
-z-index:50;
-animation:fade .2s ease;
-}
-
+.modal { display:none; position:fixed; inset:0; background: rgba(0,0,0,0.7); overflow:auto; z-index:50; }
+.modal-content { background: var(--card); margin:50px auto; padding:20px; border-radius:12px; max-width:600px; }
+.modal img { width:100%; margin-bottom:10px; }
 @keyframes fade{
 from{opacity:0}
 to{opacity:1}
