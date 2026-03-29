@@ -1,13 +1,12 @@
 # bluohm/urls.py
 from django.contrib import admin
 from django.urls import path, include
-from django.http import HttpResponse
+from .views import home
+#from django.http import HttpResponse
 from accounts.views import dashboard_view
 from django.conf import settings
 from django.conf.urls.static import static
 
-def home(request):
-    return HttpResponse("🏠 Home page — you are logged in!")
 
 urlpatterns = [
     path("", home, name="home"),
