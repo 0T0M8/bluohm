@@ -19,8 +19,8 @@ def register_view(request):
         username = request.POST.get("username")
         email = request.POST.get("email")
         phone = request.POST.get("phone")
-        password = request.POST.get("password")
-        confirm_password = request.POST.get("confirm_password")
+        password = request.POST.get("password1")
+        confirm_password = request.POST.get("password2")
         role = request.POST.get("role")
 
         # Validation
@@ -66,38 +66,67 @@ def register_view(request):
 
     return render(request, "accounts/register.html")
 
-
+"""
 def login_view(request):
-
     if request.method == "POST":
-
-        username = request.POST.get("username")
+        email = request.POST.get("email")
         password = request.POST.get("password")
 
-        user = authenticate(request, username=username, password=password)
+        try:
+            user = User.objects.get(email=email)
+            user = authenticate(request, username=user.username, password=password)
 
-        if user is not None:
+            if user is not None:
+                login(request, user)
 
-            login(request, user)
-
-            # Role-based redirect
-            role = user.profile.role
-
-            if role == "landlord":
-                return redirect("accounts:dashboard")
-
-            elif role == "agent":
-                return redirect("accounts:dashboard")
+                # Role Based Redirect
+                if user.profile.role == "landlord":
+                    return redirect("landlord_dashboard")
+                else:
+                    return redirect("tenant_dashboard")
 
             else:
-                return redirect("properties:marketplace")
+                messages.error(request, "Invalid credentials")
 
-        else:
-            messages.error(request, "Invalid username or password")
-            return redirect("accounts:login")
+        except User.DoesNotExist:
+            messages.error(request, "User does not exist")
 
     return render(request, "accounts/login.html")
+"""
+def login_view(request):
+    if request.method == "POST":
+        email = request.POST.get("email").strip().lower()
+        password = request.POST.get("password")
 
+        try:
+            user = User.objects.get(email__iexact=email)
+
+            user = authenticate(
+                request,
+                username=user.username,
+                password=password
+            )
+
+            if user is not None:
+                login(request, user)
+
+                # Role Based Redirect
+                if user.profile.role == "landlord":
+                    return redirect("accounts:dashboard")
+
+                elif user.profile.role == "agent":
+                    return redirect("accounts:dashboard")
+
+                else:
+                    return redirect("accounts:dashboard")
+
+            else:
+                messages.error(request, "Invalid email or password")
+
+        except User.DoesNotExist:
+            messages.error(request, "Invalid email or password")
+
+    return render(request, "accounts/login.html")
 
 @login_required
 def dashboard_view(request):

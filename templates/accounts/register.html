@@ -1,125 +1,219 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta name="theme-color" content="#0B1120">
+<meta name="theme-color" content="#0B1120">
+<title>Bluohm | Register</title>
 
-    <title>Bluohm | Register</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <!-- Bootstrap -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<!-- Bootstrap -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 
-    <style>
-        body {
-            background: #0f172a;
-            color: white;
-        }
+<!-- Bootstrap -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
 
-        .register-card {
-            background: #1e293b;
-            border-radius: 15px;
-            padding: 30px;
-            box-shadow: 0 0 20px rgba(0,0,0,0.5);
-        }
+<style>
 
-        .btn-primary {
-            background: #38bdf8;
-            border: none;
-        }
+body {
+    background: #0f172a;
+    color: white;
+}
 
-        .btn-primary:hover {
-            background: #0ea5e9;
-        }
-    </style>
+.auth-container {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.auth-wrapper {
+    width: 100%;
+    max-width: 420px;
+}
+
+.brand {
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 5px;
+}
+
+.subtitle {
+    color: #94a3b8;
+    margin-bottom: 25px;
+}
+
+.form-control {
+    background: #020617;
+    border: 1px solid #334155;
+    color: white;
+    padding: 12px;
+}
+
+.form-control:focus {
+    background: #020617;
+    border-color: #22c55e;
+    color: white;
+    box-shadow: none;
+}
+
+.form-select {
+    background: #020617;
+    border: 1px solid #334155;
+    color: white;
+    padding: 12px;
+}
+
+.form-select:focus {
+    background: #020617;
+    border-color: #22c55e;
+    color: white;
+    box-shadow: none;
+}
+
+.btn-success {
+    background: #22c55e;
+    border: none;
+    padding: 12px;
+}
+
+.btn-success:hover {
+    background: #16a34a;
+}
+
+.social-btn {
+    background: #020617;
+    border: 1px solid #334155;
+    color: white;
+    padding: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.social-btn:hover {
+    background: #020617;
+    widtg: 22px;
+    text-align: center;
+}
+
+.social-btn i {
+    font-size: 18px;
+    text-align: center;
+}
+
+.social-btn span {
+    text-align: center;
+}
+
+.divider {
+    text-align: center;
+    margin: 25px 0;
+    color: #94a3b8;
+}
+
+
+</style>
 
 </head>
 
 <body>
 
-<div class="container d-flex align-items-center justify-content-center" style="min-height:100vh;">
-    
-    <div class="col-md-5">
-        
-        <div class="register-card">
-            
-            <h2 class="text-center mb-4">Create Bluohm Account</h2>
+<div class="auth-container">
 
-            <!-- Messages -->
-            {% if messages %}
-                {% for message in messages %}
-                    <div class="alert alert-{{ message.tags }}">
-                        {{ message }}
-                    </div>
-                {% endfor %}
-            {% endif %}
+<div class="auth-wrapper">
 
-            <form method="POST">
-                {% csrf_token %}
+<div class="brand">Bluohm</div>
+<div class="subtitle">Create your account</div>
 
-                <div class="mb-3">
-                    <input type="text" 
-                           name="username" 
-                           class="form-control"
-                           placeholder="Username"
-                           required>
-                </div>
+<!-- Messages -->
+{% if messages %}
+{% for message in messages %}
+<div class="alert alert-danger">
+{{ message }}
+</div>
+{% endfor %}
+{% endif %}
 
-                <div class="mb-3">
-                    <input type="email" 
-                           name="email" 
-                           class="form-control"
-                           placeholder="Email"
-                           required>
-                </div>
+<form method="POST">
+{% csrf_token %}
 
-                <div class="mb-3">
-                    <input type="text" 
-                           name="phone" 
-                           class="form-control"
-                           placeholder="Phone Number">
-                </div>
+<div class="mb-3">
+<input type="text"
+name="username"
+class="form-control"
+placeholder="Username"
+required>
+</div>
 
-                <div class="mb-3">
-                    <input type="password" 
-                           name="password" 
-                           class="form-control"
-                           placeholder="Password"
-                           required>
-                </div>
+<div class="mb-3">
+<input type="email"
+name="email"
+class="form-control"
+placeholder="Email"
+required>
+</div>
 
-                <div class="mb-3">
-                    <input type="password" 
-                           name="confirm_password" 
-                           class="form-control"
-                           placeholder="Confirm Password"
-                           required>
-                </div>
+<div class="mb-3">
+<select name="role" class="form-select" required>
+<option value="">Select account type</option>
+<option value="landlord">Landlord</option>
+<option value="tenant">Tenant</option>
+</select>
+</div>
 
-                <div class="mb-3">
-                    <select name="role" class="form-control">
-                        <option value="tenant">Tenant</option>
-                        <option value="landlord">Landlord</option>
-                        <option value="agent">Agent</option>
-                    </select>
-                </div>
+<div class="mb-3">
+<input type="password"
+name="password1"
+class="form-control"
+placeholder="Password"
+required>
+</div>
 
-                <button type="submit" class="btn btn-primary w-100">
-                    Create Account
-                </button>
+<div class="mb-3">
+<input type="password"
+name="password2"
+class="form-control"
+placeholder="Confirm password"
+required>
+</div>
 
-            </form>
+<button class="btn btn-success w-100 mb-3">
+Create account
+</button>
 
-            <hr>
+</form>
 
-            <p class="text-center">
-                Already have an account? 
-                <a href="{% url 'accounts:login' %}">
-                    Login
-                </a>
-            </p>
+<div class="divider">
+or continue with
+</div>
 
-        </div>
+<button class="btn social-btn w-100 mb-2">
+<i class="bi bi-google me-2"></i>
+Sign in with Google
+</button>
 
-    </div>
+<button class="btn social-btn w-100 mb-2">
+<i class="bi bi-github me-2"></i>
+Sign in with Github
+</button>
+
+<button class="btn social-btn w-100 mb-2">
+<i class="bi bi-apple me-2"></i>
+Sign in with Apple
+</button>
+
+<hr>
+
+<p>
+Already have an account?
+<a href="{% url 'accounts:login' %}">
+Sign in
+</a>
+</p>
+
+</div>
 
 </div>
 
