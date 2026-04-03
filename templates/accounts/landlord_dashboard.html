@@ -154,6 +154,42 @@ html {
 scroll-behavior: smooth;
 }
 
+/* Light mode styles */
+
+body.light-mode {
+    background: #f8fafc;
+    color: #020617;
+}
+
+body.light-mode .topbar {
+    background: white;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+body.light-mode .sidebar {
+    background: white;
+    border-right: 1px solid #e2e8f0;
+}
+
+body.light-mode .sidebar a {
+    color: #475569;
+}
+
+body.light-mode .sidebar a:hover {
+    background: #f1f5f9;
+    color: #020617;
+}
+
+body.light-mode .card {
+    background: white;
+    color: #020617;
+    border: 1px solid #e2e8f0;
+}
+
+body.light-mode .table {
+    color: #020617;
+}
+
 </style>
 
 </head>
@@ -209,11 +245,9 @@ scroll-behavior: smooth;
 <strong>Bluohm</strong>
 
 <div>
-
-<i class="bi bi-bell me-2"></i>
-
+<!-- Dark/Light mode toggle -->
+<i class="bi bi-moon" id="themeToggle" style="cursor:pointer; margin-right:10px;"></i>
 {{ request.user.username }}
-
 </div>
 
 </div>
@@ -385,6 +419,26 @@ function toggleSidebar(){
 document.getElementById("sidebar").classList.toggle("show");
 document.getElementById("overlay").classList.toggle("show");
 }
+
+// Dark/Light Mode Toggle
+const themeToggle = document.getElementById("themeToggle");
+const body = document.body;
+
+if(localStorage.getItem("theme") === "light") {
+    body.classList.add("light-mode");
+    themeToggle.classList.replace("bi-moon","bi-sun");
+}
+
+themeToggle.addEventListener("click", () => {
+    body.classList.toggle("light-mode");
+    if(body.classList.contains("light-mode")){
+        localStorage.setItem("theme","light");
+        themeToggle.classList.replace("bi-moon","bi-sun");
+    } else {
+        localStorage.setItem("theme","dark");
+        themeToggle.classList.replace("bi-sun","bi-moon");
+    }
+});
 
 </script>
 

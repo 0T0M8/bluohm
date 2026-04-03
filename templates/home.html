@@ -22,6 +22,37 @@ min-height: 100vh;
 font-family: system-ui;
 margin:0;
 overflow-x:hidden;
+transition: .3s ease;
+}
+
+/* Light Mode */
+
+body.light-mode {
+background: #f8fafc;
+color: #020617;
+}
+
+body.light-mode .mobile-menu {
+background: #ffffff;
+}
+
+body.light-mode .mobile-menu a {
+background: rgba(0,0,0,0.04);
+color: #020617;
+}
+
+body.light-mode .contact-card {
+background: rgba(0,0,0,0.05);
+}
+
+body.light-mode .btn-signin {
+border-color: #020617;
+color: #020617;
+}
+
+body.light-mode .btn-signin:hover {
+background: #020617;
+color: white;
 }
 
 /* Header */
@@ -58,6 +89,14 @@ text-decoration: none;
 .btn-signin:hover {
 background: white;
 color: black;
+}
+
+/* Darkmode Toggle */
+
+.theme-toggle {
+cursor: pointer;
+font-size: 1.2rem;
+margin-left: 12px;
 }
 
 /* Hero */
@@ -99,6 +138,10 @@ padding: 10px;
 border-radius: 12px;
 opacity:0;
 animation: fadeUp 1.2s ease forwards;
+}
+
+body.light-mode .email-box {
+background: rgba(0,0,0,0.04);
 }
 
 .email-box input.form-control {
@@ -315,9 +358,15 @@ KRS: 0000534235</br>
 
 <div class="logo">Bluohm</div>
 
+<div class="d-flex align-items-center gap-2">
+
+<i class="bi bi-moon theme-toggle" id="themeToggle"></i>
+
 <a href="{% url 'accounts:login' %}" class="btn-signin">
 Sign in
 </a>
+
+</div>
 
 </div>
 
@@ -368,6 +417,29 @@ menu.classList.add("active")
 
 close.addEventListener("click", () => {
 menu.classList.remove("active")
+})
+
+/* Dark Mode Toggle */
+
+const themeToggle = document.getElementById("themeToggle")
+const body = document.body
+
+if(localStorage.getItem("theme") === "light"){
+body.classList.add("light-mode")
+themeToggle.classList.replace("bi-moon","bi-sun")
+}
+
+themeToggle.addEventListener("click", () => {
+body.classList.toggle("light-mode")
+
+if(body.classList.contains("light-mode")){
+localStorage.setItem("theme","light")
+themeToggle.classList.replace("bi-moon","bi-sun")
+}else{
+localStorage.setItem("theme","dark")
+themeToggle.classList.replace("bi-sun","bi-moon")
+}
+
 })
 
 </script>
