@@ -1,113 +1,179 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>Add Property | Bluohm</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#0B1120">
+<title>Bluohm | Add Property</title>
 
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
 
 <style>
 body {
     background: #0f172a;
     color: white;
+    margin: 0;
+    font-size: 14px;
 }
 
-.container {
-    max-width: 700px;
-}
-
-.form-control {
+/* Topbar */
+.topbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 60px;
     background: #020617;
-    border: 1px solid #1e293b;
+    border-bottom: 1px solid #334155;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 15px;
+    z-index: 1000;
+}
+
+/* Form Card */
+.card {
+    background: #020617;
+    border: 1px solid #334155;
     color: white;
 }
 
-.form-control:focus {
-    background: #020617;
-    color: white;
-    border-color: #38bdf8;
-    box-shadow: none;
-}
-
-.btn-primary {
-    background: #38bdf8;
+/* Buttons */
+.btn-success {
+    background-color: #10b981;
     border: none;
 }
 
-.btn-primary:hover {
-    background: #0ea5e9;
+input, select, textarea {
+    background: #0f172a;
+    color: white;
+    border: 1px solid #334155;
+    border-radius: 6px;
+    padding: 8px;
+    width: 100%;
+}
+
+input:focus, textarea:focus, select:focus {
+    outline: none;
+    border-color: #10b981;
+}
+
+/* Light mode styles */
+body.light-mode {
+    background: #f8fafc;
+    color: #020617;
+}
+
+body.light-mode .topbar {
+    background: white;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+body.light-mode .card {
+    background: white;
+    color: #020617;
+    border: 1px solid #e2e8f0;
+}
+
+body.light-mode input, body.light-mode select, body.light-mode textarea {
+    background: white;
+    color: #020617;
+    border: 1px solid #cbd5e1;
 }
 </style>
-
 </head>
 
 <body>
 
-<div class="container py-5">
-
-<h2 class="mb-4">Add Property</h2>
-
-<form method="POST" enctype="multipart/form-data">
-{% csrf_token %}
-
-<div class="mb-3">
-<label>Title</label>
-<input type="text" name="title" class="form-control" required>
+<!-- Topbar -->
+<div class="topbar">
+    <strong>Bluohm</strong>
+    <div>
+        <i class="bi bi-moon" id="themeToggle" style="cursor:pointer; margin-right:10px;"></i>
+        <a href="{% url 'properties:landlord_dashboard' %}" class="btn btn-sm btn-light">Back to Dashboard</a>
+    </div>
 </div>
 
-<div class="mb-3">
-<label>Description</label>
-<textarea name="description" class="form-control" rows="3"></textarea>
+<div class="container" style="margin-top:80px; max-width:600px;">
+
+    <div class="card p-4">
+        <h5 class="mb-3">Add New Property</h5>
+
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            <div class="mb-3">
+                <label class="form-label">Title</label>
+                <input type="text" name="title" placeholder="Property title" required>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Price (MK)</label>
+                <input type="number" name="price" placeholder="Property price" required>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Bedrooms</label>
+                <input type="number" name="bedrooms" placeholder="Number of bedrooms" required>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Bathrooms</label>
+                <input type="number" name="bathrooms" placeholder="Number of bathrooms" required>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Location</label>
+                <input type="text" name="location" placeholder="Area, City" required>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col">
+                    <label class="form-label">Latitude</label>
+                    <input type="text" name="latitude" placeholder="Latitude" required>
+                </div>
+                <div class="col">
+                    <label class="form-label">Longitude</label>
+                    <input type="text" name="longitude" placeholder="Longitude" required>
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Property Images</label>
+                <input type="file" name="images" multiple required>
+                <small class="text-muted">You can upload multiple images</small>
+            </div>
+
+            <button type="submit" class="btn btn-success w-100">
+                <i class="bi bi-plus"></i> Add Property
+            </button>
+        </form>
+    </div>
+
 </div>
 
-<div class="mb-3">
-<label>Price</label>
-<input type="number" name="price" class="form-control" required>
-</div>
+<script>
+// Dark/Light Mode Toggle
+const themeToggle = document.getElementById("themeToggle");
+const body = document.body;
 
-<div class="row">
-<div class="col-md-6 mb-3">
-<label>Bedrooms</label>
-<input type="number" name="bedrooms" class="form-control">
-</div>
+if(localStorage.getItem("theme") === "light") {
+    body.classList.add("light-mode");
+    themeToggle.classList.replace("bi-moon","bi-sun");
+}
 
-<div class="col-md-6 mb-3">
-<label>Bathrooms</label>
-<input type="number" name="bathrooms" class="form-control">
-</div>
-</div>
-
-<div class="mb-3">
-<label>Location</label>
-<input type="text" name="location" class="form-control">
-</div>
-
-<div class="row">
-<div class="col-md-6 mb-3">
-<label>Latitude</label>
-<input type="text" name="latitude" class="form-control">
-</div>
-
-<div class="col-md-6 mb-3">
-<label>Longitude</label>
-<input type="text" name="longitude" class="form-control">
-</div>
-</div>
-
-<div class="mb-3">
-<label>Property Images</label>
-<input type="file" name="images" multiple class="form-control">
-</div>
-
-<button class="btn btn-primary w-100 mt-3">
-Add Property
-</button>
-
-</form>
-
-</div>
+themeToggle.addEventListener("click", () => {
+    body.classList.toggle("light-mode");
+    if(body.classList.contains("light-mode")){
+        localStorage.setItem("theme","light");
+        themeToggle.classList.replace("bi-moon","bi-sun");
+    } else {
+        localStorage.setItem("theme","dark");
+        themeToggle.classList.replace("bi-sun","bi-moon");
+    }
+});
+</script>
 
 </body>
 </html>
