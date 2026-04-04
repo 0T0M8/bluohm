@@ -7,4 +7,5 @@ app_name = 'properties'
 urlpatterns = [
     path("add/", views.add_property, name="add_property"),
     path("dashboard/", views.landlord_dashboard, name="landlord_dashboard"),
+    path('property/<int:property_id>/', views.property_detail, name='property_detail'),
 ]

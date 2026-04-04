@@ -1,0 +1,46 @@
+<!-- templates/landlord/property_detail.html -->
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container py-4">
+    <h2 class="mb-3">{{ property.title }}</h2>
+    <p>{{ property.description }}</p>
+
+    <!-- Image Gallery -->
+    <div class="row mb-4">
+        {% for image in images %}
+        <div class="col-md-4 mb-2">
+            <img src="{{ image.image.url }}" class="img-fluid rounded" alt="Property Image">
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Map -->
+    {% if property.latitude and property.longitude %}
+    <div id="map" style="height: 400px;"></div>
+    <script>
+        function initMap() {
+            const propertyLoc = { lat: {{ property.latitude }}, lng: {{ property.longitude }} };
+            const map = new google.maps.Map(document.getElementById("map"), {
+                zoom: 15,
+                center: propertyLoc,
+            });
+            const marker = new google.maps.Marker({
+                position: propertyLoc,
+                map: map,
+            });
+        }
+    </script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_GOOGLE_MAPS_API_KEY&callback=initMap" async defer></script>
+    {% endif %}
+
+    <!-- Property Info -->
+    <ul class="list-group mt-4">
+        <li class="list-group-item"><strong>Price:</strong> ${{ property.price }}</li>
+        <li class="list-group-item"><strong>Location:</strong> {{ property.location }}</li>
+        <li class="list-group-item"><strong>Type:</strong> {{ property.property_type }}</li>
+        <li class="list-group-item"><strong>Bedrooms:</strong> {{ property.bedrooms }}</li>
+        <li class="list-group-item"><strong>Bathrooms:</strong> {{ property.bathrooms }}</li>
+    </ul>
+</div>
+{% endblock %}

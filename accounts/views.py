@@ -66,6 +66,37 @@ def register_view(request):
 
     return render(request, "accounts/register.html")
 
+def login_view(request):
+    if request.method == "POST":
+        email = request.POST.get("email", "").strip().lower()
+        password = request.POST.get("password", "")
+
+        try:
+            user_obj = User.objects.get(email__iexact=email)
+            
+            user = authenticate(request, username=user_obj.username, password=password)
+
+            if user is not None:
+                login(request, user)
+
+                # Role-based redirect
+                role = getattr(user.profile, "role", None)
+
+                if role == "landlord":
+                    return redirect("properties:landlord_dashboard")
+                elif role == "agent":
+                    return redirect("properties:agent_dashboard")  # create this later if needed
+                else:
+                    return redirect("accounts:home")  # general user dashboard/homepage
+
+            else:
+                messages.error(request, "Invalid email or password")
+
+        except User.DoesNotExist:
+            messages.error(request, "Invalid email or password")
+
+    return render(request, "accounts/login.html")
+
 """
 def login_view(request):
     if request.method == "POST":
@@ -93,6 +124,7 @@ def login_view(request):
 
     return render(request, "accounts/login.html")
 """
+'''
 def login_view(request):
     if request.method == "POST":
         email = request.POST.get("email").strip().lower()
@@ -112,10 +144,10 @@ def login_view(request):
 
                 # Role Based Redirect
                 if user.profile.role == "landlord":
-                    return redirect("accounts:dashboard")
+                    return redirect("properties:landlord_dashboard")
 
                 elif user.profile.role == "agent":
-                    return redirect("accounts:dashboard")
+                    return redirect("properties:landlord_dashboard")
 
                 else:
                     return redirect("accounts:dashboard")
@@ -127,7 +159,7 @@ def login_view(request):
             messages.error(request, "Invalid email or password")
 
     return render(request, "accounts/login.html")
-
+'''
 @login_required
 def dashboard_view(request):
 

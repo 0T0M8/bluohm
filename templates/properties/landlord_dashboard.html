@@ -1,460 +1,186 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-
-<meta name="theme-color" content="#0B1120">
+<meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-
+<meta name="theme-color" content="#0B1120">
 <title>Bluohm | Landlord Dashboard</title>
 
+<!-- Bootstrap -->
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
 
 <style>
-
 /* Base (Mobile First) */
-
-body {
-background: #0f172a;
-color: white;
-margin: 0;
-font-size: 14px;
-}
-
+body { background: #0f172a; color: white; margin:0; font-size:14px; }
 /* Topbar */
-
-.topbar {
-position: fixed;
-top: 0;
-left: 0;
-right: 0;
-height: 60px;
-background: #020617;
-border-bottom: 1px solid #334155;
-display: flex;
-align-items: center;
-justify-content: space-between;
-padding: 0 15px;
-z-index: 1000;
-}
-
-/* Sidebar (Mobile Drawer) */
-
-.sidebar {
-position: fixed;
-top: 0;
-left: -260px;
-width: 260px;
-height: 100vh;
-background: #020617;
-padding: 20px;
-transition: 0.3s;
-z-index: 1100;
-border-right: 1px solid #334155;
-}
-
-.sidebar.show {
-left: 0;
-}
-
-.sidebar a {
-display: block;
-color: #94a3b8;
-padding: 12px;
-text-decoration: none;
-border-radius: 6px;
-margin-bottom: 5px;
-}
-
-.sidebar a:hover {
-background: #1e293b;
-color: white;
-}
-
+.topbar { position: fixed; top:0; left:0; right:0; height:60px; background:#020617; border-bottom:1px solid #334155; display:flex; align-items:center; justify-content:space-between; padding:0 15px; z-index:1000; }
+/* Sidebar */
+.sidebar { position:fixed; top:0; left:-260px; width:260px; height:100vh; background:#020617; padding:20px; transition:0.3s; z-index:1100; border-right:1px solid #334155; }
+.sidebar.show { left:0; }
+.sidebar a { display:block; color:#94a3b8; padding:12px; text-decoration:none; border-radius:6px; margin-bottom:5px; }
+.sidebar a:hover { background:#1e293b; color:white; }
 /* Overlay */
-
-.overlay {
-position: fixed;
-top: 0;
-left: 0;
-right: 0;
-bottom: 0;
-background: rgba(0,0,0,0.6);
-display: none;
-z-index: 1050;
-}
-
-.overlay.show {
-display: block;
-}
-
+.overlay { position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.6); display:none; z-index:1050; }
+.overlay.show { display:block; }
 /* Main */
-
-.main {
-margin-top: 60px;
-padding: 15px;
-}
-
+.main { margin-top:60px; padding:15px; }
 /* Cards */
-
-.card {
-background: #020617;
-border: 1px solid #334155;
-color: white;
-}
-
-.stat-number {
-font-size: 22px;
-font-weight: bold;
-}
-
+.card { background:#020617; border:1px solid #334155; color:white; }
+.stat-number { font-size:22px; font-weight:bold; }
 /* Section */
-
-.section {
-padding: 30px 0;
-border-bottom: 1px solid #334155;
-}
-
+.section { padding:30px 0; border-bottom:1px solid #334155; }
 /* Tables */
-
-.table {
-color: white;
-min-width: 600px;
-}
-
-.table-responsive {
-overflow-x: auto;
-}
-
+.table { color:white; min-width:600px; }
+.table-responsive { overflow-x:auto; }
 /* Desktop */
-
-@media (min-width: 768px){
-
-.sidebar {
-left: 0;
-top: 60px;
-height: calc(100vh - 60px);
-}
-
-.overlay {
-display: none !important;
-}
-
-.main {
-margin-left: 260px;
-padding: 30px;
-}
-
-}
-
+@media(min-width:768px) { .sidebar { left:0; top:60px; height:calc(100vh - 60px); } .overlay { display:none !important; } .main { margin-left:260px; padding:30px; } }
 /* Smooth scroll */
-
-html {
-scroll-behavior: smooth;
-}
-
-/* Light mode styles */
-
-body.light-mode {
-    background: #f8fafc;
-    color: #020617;
-}
-
-body.light-mode .topbar {
-    background: white;
-    border-bottom: 1px solid #e2e8f0;
-}
-
-body.light-mode .sidebar {
-    background: white;
-    border-right: 1px solid #e2e8f0;
-}
-
-body.light-mode .sidebar a {
-    color: #475569;
-}
-
-body.light-mode .sidebar a:hover {
-    background: #f1f5f9;
-    color: #020617;
-}
-
-body.light-mode .card {
-    background: white;
-    color: #020617;
-    border: 1px solid #e2e8f0;
-}
-
-body.light-mode .table {
-    color: #020617;
-}
-
+html { scroll-behavior:smooth; }
+/* Light mode */
+body.light-mode { background:#f8fafc; color:#020617; }
+body.light-mode .topbar { background:white; border-bottom:1px solid #e2e8f0; }
+body.light-mode .sidebar { background:white; border-right:1px solid #e2e8f0; }
+body.light-mode .sidebar a { color:#475569; }
+body.light-mode .sidebar a:hover { background:#f1f5f9; color:#020617; }
+body.light-mode .card { background:white; color:#020617; border:1px solid #e2e8f0; }
+body.light-mode .table { color:#020617; }
 </style>
-
 </head>
-
 <body>
 
 <!-- Sidebar -->
-
 <div class="sidebar" id="sidebar">
-
-<h5 class="mb-4">Bluohm</h5>
-
-<a href="#dashboard">
-<i class="bi bi-speedometer2"></i> Dashboard
-</a>
-
-<a href="#properties">
-<i class="bi bi-house"></i> Properties
-</a>
-
-<a href="#tenants">
-<i class="bi bi-people"></i> Tenants
-</a>
-
-<a href="#payments">
-<i class="bi bi-cash"></i> Payments
-</a>
-
-<a href="#analytics">
-<i class="bi bi-graph-up"></i> Analytics
-</a>
-
-<hr>
-
-<a href="{% url 'accounts:logout' %}">
-<i class="bi bi-box-arrow-right"></i> Logout
-</a>
-
+    <h5 class="mb-4">Bluohm</h5>
+    <a href="#dashboard"><i class="bi bi-speedometer2"></i> Dashboard</a>
+    <a href="#properties"><i class="bi bi-house"></i> Properties</a>
+    <a href="#tenants"><i class="bi bi-people"></i> Tenants</a>
+    <a href="#payments"><i class="bi bi-cash"></i> Payments</a>
+    <a href="#analytics"><i class="bi bi-graph-up"></i> Analytics</a>
+    <hr>
+    <a href="{% url 'accounts:logout' %}"><i class="bi bi-box-arrow-right"></i> Logout</a>
 </div>
 
 <!-- Overlay -->
-
 <div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
 
 <!-- Topbar -->
-
 <div class="topbar">
-
-<button class="btn btn-sm btn-dark" onclick="toggleSidebar()">
-<i class="bi bi-list"></i>
-</button>
-
-<strong>Bluohm</strong>
-
-<div>
-<!-- Dark/Light mode toggle -->
-<i class="bi bi-moon" id="themeToggle" style="cursor:pointer; margin-right:10px;"></i>
-{{ request.user.username }}
-</div>
-
+    <button class="btn btn-sm btn-dark" onclick="toggleSidebar()"><i class="bi bi-list"></i></button>
+    <strong>Bluohm</strong>
+    <div>
+        <i class="bi bi-moon" id="themeToggle" style="cursor:pointer; margin-right:10px;"></i>
+        {{ request.user.username }}
+    </div>
 </div>
 
 <!-- Main -->
-
 <div class="main">
 
 <!-- Dashboard -->
-
 <div id="dashboard" class="section">
-
-<h5>Dashboard</h5>
-
-<div class="row mt-3">
-
-<div class="col-12 col-md-4 mb-3">
-<div class="card p-3">
-
-Properties
-<div class="row mt-3">
-
-{% for property in properties %}
-
-<div class="col-12 col-md-4 mb-3">
-
-<div class="card p-3">
-
-<h6>{{ property.title }}</h6>
-
-<p>{{ property.bedrooms }} Bed • {{ property.bathrooms }} Bath</p>
-
-<p>{{ property.location }}</p>
-
-<button class="btn btn-success btn-sm">
-View
-</button>
-
-</div>
-
-</div>
-
-{% empty %}
-
-<p>No Properties yet</p>
-
-{% endfor %}
-
-</div>
-
-Tenants
-<div class="stat-number">7</div>
-</div>
-</div>
-
-<div class="col-12 col-md-4 mb-3">
-<div class="card p-3">
-Monthly Income
-<div class="stat-number">MK 850,000</div>
-</div>
-</div>
-
-</div>
-
+    <h5>Dashboard</h5>
+    <div class="row mt-3">
+        <div class="col-12 col-md-4 mb-3">
+            <div class="card p-3">Properties<div class="stat-number">{{ properties|length }}</div></div>
+        </div>
+        <div class="col-12 col-md-4 mb-3">
+            <div class="card p-3">Tenants<div class="stat-number">7</div></div>
+        </div>
+        <div class="col-12 col-md-4 mb-3">
+            <div class="card p-3">Monthly Income<div class="stat-number">MK 850,000</div></div>
+        </div>
+    </div>
 </div>
 
 <!-- Properties -->
-
 <div id="properties" class="section">
-
-<h5>Properties</h5>
-
-<div class="row mt-3">
-
-<div class="col-12 col-md-4 mb-3">
-
-<div class="card p-3">
-
-<h6>Area 18 Apartment</h6>
-
-<p>3 Units</p>
-
-<button class="btn btn-success btn-sm">
-View
-</button>
-
-</div>
-
-</div>
-
-</div>
-
-<a href="{% url 'properties:add_property' %}" class="btn btn-success w-100 mt-2">
-<i class="bi bi-plus"></i>Add Property
-</a>
-
+    <h5>Properties</h5>
+    <div class="row mt-3">
+        {% if properties %}
+            {% for property in properties %}
+            <div class="col-12 col-md-4 mb-3">
+                <div class="card p-3">
+                    <h6>{{ property.title }}</h6>
+                    <p>{{ property.bedrooms }} Bed / {{ property.bathrooms }} Bath</p>
+                    <p>{{ property.location }}</p>
+                    <div class="property-images mb-2" style="overflow-x:auto; white-space: nowrap;">
+                        {% for img in property.propertyimage_set.all %}
+                        <img src="{{ img.image.url }}" class="rounded me-1" style="height:80px; display:inline-block;">
+                        {% endfor %}
+                    </div>
+                    <p>MK {{ property.price }}</p>
+                    <button class="btn btn-success btn-sm">View</button>
+                    <!-- templates/landlord/dashboard.html -->
+                    <a href="{% url 'properties:property_detail' property.id %}" class="btn btn-primary">
+                       View
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <p>No properties yet. Be the first landlord to add a property.</p>
+        {% endif %}
+    </div>
+    <a href="{% url 'properties:add_property' %}" class="btn btn-success w-100 mt-2">
+        <i class="bi bi-plus"></i> Add Property
+    </a>
 </div>
 
 <!-- Tenants -->
-
 <div id="tenants" class="section">
-
-<h5>Tenants</h5>
-
-<div class="card p-3 mt-3 table-responsive">
-
-<table class="table">
-
-<thead>
-
-<tr>
-<th>Name</th>
-<th>Property</th>
-<th>Rent</th>
-<th>Status</th>
-</tr>
-
-</thead>
-
-<tbody>
-
-<tr>
-<td>John Banda</td>
-<td>Area 18</td>
-<td>MK 120,000</td>
-<td>Paid</td>
-</tr>
-
-</tbody>
-
-</table>
-
-</div>
-
+    <h5>Tenants</h5>
+    <div class="card p-3 mt-3 table-responsive">
+        <table class="table">
+            <thead>
+                <tr><th>Name</th><th>Property</th><th>Rent</th><th>Status</th></tr>
+            </thead>
+            <tbody>
+                <tr><td>John Banda</td><td>Area 18</td><td>MK 120,000</td><td>Paid</td></tr>
+            </tbody>
+        </table>
+    </div>
 </div>
 
 <!-- Payments -->
-
 <div id="payments" class="section">
-
-<h5>Payments</h5>
-
-<div class="card p-3 mt-3 table-responsive">
-
-<table class="table">
-
-<thead>
-
-<tr>
-<th>Tenant</th>
-<th>Amount</th>
-<th>Date</th>
-<th>Status</th>
-</tr>
-
-</thead>
-
-<tbody>
-
-<tr>
-<td>John Banda</td>
-<td>MK 120,000</td>
-<td>March 1</td>
-<td>Paid</td>
-</tr>
-
-</tbody>
-
-</table>
-
-</div>
-
+    <h5>Payments</h5>
+    <div class="card p-3 mt-3 table-responsive">
+        <table class="table">
+            <thead>
+                <tr><th>Tenant</th><th>Amount</th><th>Date</th><th>Status</th></tr>
+            </thead>
+            <tbody>
+                <tr><td>John Banda</td><td>MK 120,000</td><td>March 1</td><td>Paid</td></tr>
+            </tbody>
+        </table>
+    </div>
 </div>
 
 <!-- Analytics -->
-
 <div id="analytics" class="section">
-
-<h5>Analytics</h5>
-
-<div class="card p-3 mt-3">
-
-Analytics coming soon
-
-</div>
-
+    <h5>Analytics</h5>
+    <div class="card p-3 mt-3">Analytics coming soon</div>
 </div>
 
 </div>
 
 <script>
-
 function toggleSidebar(){
-document.getElementById("sidebar").classList.toggle("show");
-document.getElementById("overlay").classList.toggle("show");
+    document.getElementById("sidebar").classList.toggle("show");
+    document.getElementById("overlay").classList.toggle("show");
 }
 
 // Dark/Light Mode Toggle
 const themeToggle = document.getElementById("themeToggle");
 const body = document.body;
 
-if(localStorage.getItem("theme") === "light") {
+if(localStorage.getItem("theme")==="light"){
     body.classList.add("light-mode");
     themeToggle.classList.replace("bi-moon","bi-sun");
 }
 
-themeToggle.addEventListener("click", () => {
+themeToggle.addEventListener("click",()=>{
     body.classList.toggle("light-mode");
     if(body.classList.contains("light-mode")){
         localStorage.setItem("theme","light");
@@ -464,7 +190,6 @@ themeToggle.addEventListener("click", () => {
         themeToggle.classList.replace("bi-sun","bi-moon");
     }
 });
-
 </script>
 
 </body>

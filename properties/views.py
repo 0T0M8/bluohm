@@ -1,5 +1,5 @@
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from .models import Property, PropertyImage
 
 @login_required
@@ -43,3 +43,12 @@ def landlord_dashboard(request):
     return render(request, "properties/landlord_dashboard.html", {
         "properties": properties
     })
+
+def property_detail(request, property_id):
+    property = get_object_or_404(Property, id=property_id)
+    images = property.images.all()  # Assuming a related model for multiple images
+    context = {
+        'property': property,
+        'images': images,
+    }
+    return render(request, 'properties/property_detail.html', context)
