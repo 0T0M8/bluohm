@@ -266,13 +266,38 @@ body.light-mode .table {
 
 <div class="col-12 col-md-4 mb-3">
 <div class="card p-3">
+
 Properties
-<div class="stat-number">3</div>
-</div>
-</div>
+<div class="row mt-3">
+
+{% for property in properties %}
 
 <div class="col-12 col-md-4 mb-3">
+
 <div class="card p-3">
+
+<h6>{{ property.title }}</h6>
+
+<p>{{ property.bedrooms }} Bed • {{ property.bathrooms }} Bath</p>
+
+<p>{{ property.location }}</p>
+
+<button class="btn btn-success btn-sm">
+View
+</button>
+
+</div>
+
+</div>
+
+{% empty %}
+
+<p>No Properties yet</p>
+
+{% endfor %}
+
+</div>
+
 Tenants
 <div class="stat-number">7</div>
 </div>
@@ -315,9 +340,9 @@ View
 
 </div>
 
-<button class="btn btn-success w-100  mt-2">
+<a href="{% url 'properties:add_property' %}" class="btn btn-success w-100 mt-2">
 <i class="bi bi-plus"></i>Add Property
-</button>
+</a>
 
 </div>
 

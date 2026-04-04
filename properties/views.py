@@ -1,45 +1,45 @@
-# properties/views.py
-from django.shortcuts import render, redirect, get_object_or_404
-from django.views import View
-from .models import Property
-from .forms import PropertyForm
 from django.contrib.auth.decorators import login_required
-from django.utils.decorators import method_decorator
+from django.shortcuts import render, redirect
+from .models import Property, PropertyImage
 
-# -------------------------------
-# Marketplace (List)
-# -------------------------------
-class MarketplaceView(View):
-    def get(self, request):
-        properties = Property.objects.all()
-        return render(request, 'properties/marketplace.html', {'properties': properties})
+@login_required
+def add_property(request):
 
-# -------------------------------
-# Property Detail
-# -------------------------------
-class PropertyDetailView(View):
-    def get(self, request, id):
-        property_obj = get_object_or_404(Property, id=id)
-        return render(request, 'properties/detail.html', {'property': property_obj})
+    if request.method == "POST":
+        title = request.POST.get("title")
+        price = request.POST.get("price")
+        bedrooms = request.POST.get("bedrooms")
+        bathrooms = request.POST.get("bathrooms")
+        location = request.POST.get("location")
+        latitude = request.POST.get("latitude")
+        longitude = request.POST.get("longitude")
 
-# -------------------------------
-# Add Property (only landlords)
-# -------------------------------
-@method_decorator(login_required, name='dispatch')
-class AddPropertyView(View):
-    def get(self, request):
-        if request.user.profile.role != 'landlord':
-            return redirect('properties:marketplace')
-        form = PropertyForm()
-        return render(request, 'properties/add_property.html', {'form': form})
+        property = Property.objects.create(
+            owner=request.user,
+            title=title,
+            price=price,
+            bedrooms=bedrooms,
+            bathrooms=bathrooms,
+            location=location,
+            latitude=latitude,
+            longitude=longitude,
+        )
 
-    def post(self, request):
-        if request.user.profile.role != 'landlord':
-            return redirect('properties:marketplace')
-        form = PropertyForm(request.POST, request.FILES)
-        if form.is_valid():
-            property_obj = form.save(commit=False)
-            property_obj.landlord = request.user
-            property_obj.save()
-            return redirect('properties:marketplace')
-        return render(request, 'properties/add_property.html', {'form': form})
+        for image in request.FILES.getlist("images"):
+            PropertyImage.objects.create(
+                property=property,
+                image=image
+            )
+
+        return redirect("properties:landlord_dashboard")
+
+    return render(request, "properties/add_property.html")
+
+@login_required
+def landlord_dashboard(request):
+
+    properties = Property.objects.filter(owner=request.user)
+
+    return render(request, "properties/landlord_dashboard.html", {
+        "properties": properties
+    })

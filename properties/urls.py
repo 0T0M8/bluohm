@@ -1,11 +1,10 @@
 # properties/urls.py
 from django.urls import path
-from .views import MarketplaceView, PropertyDetailView, AddPropertyView
+from . import views
 
 app_name = 'properties'
 
 urlpatterns = [
-    path('', MarketplaceView.as_view(), name='marketplace'),
-    path('add/', AddPropertyView.as_view(), name='add_property'),
-    path('<int:id>/', PropertyDetailView.as_view(), name='property_detail'),
+    path("add/", views.add_property, name="add_property"),
+    path("dashboard/", views.landlord_dashboard, name="landlord_dashboard"),
 ]
