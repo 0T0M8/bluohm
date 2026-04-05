@@ -1,6 +1,7 @@
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import Property, PropertyImage
+from .forms import PropertyForm
 
 @login_required
 def add_property(request):
@@ -34,6 +35,30 @@ def add_property(request):
         return redirect("properties:landlord_dashboard")
 
     return render(request, "properties/add_property.html")
+
+def edit_property(request, property_id):
+    property = get_object_or_404(Property, id=property_id)
+
+    if request.method == "POST":
+        form = PropertyForm(request.POST, request.FILES, instance=property)
+
+        if form.is_valid():
+            form.save()
+            return redirect('properties:property_detail', property.id)
+
+    else:
+        form = PropertyForm(instance=property)
+
+    return render(request, "properties/add_property.html", {
+        "form": form
+    })
+
+def delete_property(request, property_id):
+    property = get_object_or_404(Property, id=property_id)
+
+    property.delete()
+
+    return redirect('properties:landlord_dashboard')
 
 @login_required
 def landlord_dashboard(request):

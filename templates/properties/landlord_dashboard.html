@@ -110,10 +110,9 @@ body.light-mode .table { color:#020617; }
                         {% endfor %}
                     </div>
                     <p>MK {{ property.price }}</p>
-                    <button class="btn btn-success btn-sm">View</button>
-                    <!-- templates/landlord/dashboard.html -->
-                    <a href="{% url 'properties:property_detail' property.id %}" class="btn btn-primary">
-                       View
+
+                    <a href="{% url 'properties:property_detail' property.id %}" class="btn btn-success btn-sm">
+                    <i class="bi bi-eye"></i> View
                     </a>
                 </div>
             </div>
