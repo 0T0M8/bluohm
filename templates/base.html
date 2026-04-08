@@ -13,55 +13,89 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
 
 <!-- Leaflet Maps -->
-<link 
-rel="stylesheet" 
-href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-/>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 
 <style>
 
 body {
 background: #f8f9fa;
+font-family: system-ui, -apple-system, sans-serif;
 }
+
+/* Sidebar */
 
 .sidebar {
 width: 260px;
 height: 100vh;
 position: fixed;
+top: 0;
+left: -260px;
 background: white;
 border-right: 1px solid #eee;
 padding-top: 20px;
-}
-
-.sidebar a {
-padding: 12px 20px;
-display: block;
-color: #333;
-text-decoration: none;
-}
-
-.sidebar a:hover {
-background: #f5f5f5;
-}
-
-.main-content {
-margin-left: 260px;
-padding: 20px;
-}
-
-@media (max-width: 991px) {
-
-.sidebar {
-left: -260px;
 transition: 0.3s;
+z-index: 1050;
 }
 
 .sidebar.show {
 left: 0;
 }
 
+.sidebar a {
+display: flex;
+align-items: center;
+gap: 10px;
+padding: 12px 20px;
+color: #333;
+text-decoration: none;
+font-weight: 500;
+}
+
+.sidebar a:hover {
+background: #f5f5f5;
+}
+
+.sidebar-overlay {
+position: fixed;
+top: 0;
+left: 0;
+width: 100%;
+height: 100%;
+background: rgba(0,0,0,0.3);
+opacity: 0;
+visibility: hidden;
+transition: 0.3s;
+z-index: 1040;
+}
+
+.sidebar-overlay.show {
+opacity: 1;
+visibility: visible;
+}
+
 .main-content {
-margin-left: 0;
+padding: 20px;
+}
+
+.navbar-top {
+background: white;
+border-bottom: 1px solid #eee;
+padding: 12px 20px;
+border-radius: 10px;
+}
+
+@media (min-width: 992px) {
+
+.sidebar {
+left: 0;
+}
+
+.main-content {
+margin-left: 260px;
+}
+
+.sidebar-overlay {
+display: none;
 }
 
 }
@@ -85,38 +119,45 @@ Bluohm
 </div>
 
 
-<a href="#">
-<i class="bi bi-speedometer2 me-2"></i>
+<a href="{% url 'properties:landlord_dashboard' %}">
+<i class="bi bi-speedometer2"></i>
 Dashboard
 </a>
 
-<a href="#">
-<i class="bi bi-buildings me-2"></i>
+<a href="{% url 'properties:property_detail' property.id %}">
+<i class="bi bi-buildings"></i>
 Properties
 </a>
 
 <a href="#">
-<i class="bi bi-people me-2"></i>
+<i class="bi bi-people"></i>
 Tenants
 </a>
 
 <a href="#">
-<i class="bi bi-cash-stack me-2"></i>
+<i class="bi bi-cash-stack"></i>
 Payments
 </a>
 
 <a href="#">
-<i class="bi bi-heart me-2"></i>
+<i class="bi bi-heart"></i>
 Favorites
 </a>
 
 <a href="#">
-<i class="bi bi-gear me-2"></i>
+<i class="bi bi-gear"></i>
 Settings
 </a>
 
+<a href="{% url 'accounts:login' %}">
+<i class="bi bi-box-arrow-right"></i>
+Logout
+</a>
 
 </div>
+
+
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
 
 
 
@@ -125,22 +166,18 @@ Settings
 
 
 <!-- Top Navbar -->
-<div class="d-flex justify-content-between align-items-center mb-4">
+<div class="navbar-top d-flex justify-content-between align-items-center mb-4">
 
 <button class="btn btn-light d-lg-none" onclick="toggleSidebar()">
 <i class="bi bi-list fs-4"></i>
 </button>
 
-
 <div class="fw-semibold">
-Landlord Dashboard
+Bluohm Dashboard
 </div>
 
-
 <div>
-
 <i class="bi bi-person-circle fs-4"></i>
-
 </div>
 
 </div>
@@ -153,20 +190,26 @@ Landlord Dashboard
 </div>
 
 
-
 <!-- Scripts -->
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
-<script 
-src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js">
-</script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
 <script>
 
+const sidebar = document.getElementById("sidebar");
+const overlay = document.getElementById("sidebarOverlay");
+
 function toggleSidebar() {
-document.getElementById("sidebar").classList.toggle("show");
+sidebar.classList.toggle("show");
+overlay.classList.toggle("show");
 }
+
+overlay.addEventListener("click", () => {
+sidebar.classList.remove("show");
+overlay.classList.remove("show");
+});
 
 </script>
 
