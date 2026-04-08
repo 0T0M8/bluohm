@@ -1,122 +1,295 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="container py-4">
+<div class="container-fluid px-lg-5 py-4">
 
 <!-- Header -->
-<div class="d-flex justify-content-between align-items-center mb-3">
-    <h2>{{ property.title }}</h2>
+<div class="d-flex justify-content-between align-items-start mb-4 flex-wrap gap-3">
 
-    <div>
-        <a href="{% url 'properties:edit_property' property.id %}" 
-           class="btn btn-warning">
-           ✏️ Edit
-        </a>
+<div>
+<h2 class="fw-bold mb-1">{{ property.title }}</h2>
 
-        <a href="{% url 'properties:delete_property' property.id %}" 
-           class="btn btn-danger">
-           🗑 Delete
-        </a>
-    </div>
+<div class="text-muted d-flex align-items-center gap-2">
+<i class="bi bi-geo-alt"></i>
+<span>{{ property.location }}</span>
+</div>
+</div>
+
+<div class="d-flex gap-2">
+
+<a href="{% url 'properties:edit_property' property.id %}" 
+class="btn btn-light border">
+<i class="bi bi-pencil"></i>
+</a>
+
+<a href="{% url 'properties:delete_property' property.id %}" 
+class="btn btn-light border">
+<i class="bi bi-trash"></i>
+</a>
+
+</div>
+
 </div>
 
 
 <!-- Image Carousel -->
 {% if property.images.all %}
-<div id="propertyCarousel" class="carousel slide mb-4" data-bs-ride="carousel">
 
-    <div class="carousel-inner">
-        {% for image in property.images.all %}
-        <div class="carousel-item {% if forloop.first %}active{% endif %}">
-            <img src="{{ image.image.url }}" 
-                 class="d-block w-100 rounded"
-                 style="height:400px; object-fit:cover;">
-        </div>
-        {% endfor %}
-    </div>
+<div id="propertyCarousel" 
+class="carousel slide mb-4 rounded overflow-hidden shadow-sm"
+data-bs-ride="carousel">
 
-    <button class="carousel-control-prev" type="button" 
-            data-bs-target="#propertyCarousel" 
-            data-bs-slide="prev">
-        <span class="carousel-control-prev-icon"></span>
-    </button>
+<div class="carousel-inner">
 
-    <button class="carousel-control-next" type="button" 
-            data-bs-target="#propertyCarousel" 
-            data-bs-slide="next">
-        <span class="carousel-control-next-icon"></span>
-    </button>
+{% for image in property.images.all %}
+<div class="carousel-item {% if forloop.first %}active{% endif %}">
+<img src="{{ image.image.url }}" 
+class="w-100"
+style="height:450px; object-fit:cover;">
+</div>
+{% endfor %}
 
 </div>
+
+<button class="carousel-control-prev" 
+type="button"
+data-bs-target="#propertyCarousel"
+data-bs-slide="prev">
+
+<span class="carousel-control-prev-icon"></span>
+
+</button>
+
+<button class="carousel-control-next" 
+type="button"
+data-bs-target="#propertyCarousel"
+data-bs-slide="next">
+
+<span class="carousel-control-next-icon"></span>
+
+</button>
+
+</div>
+
 {% endif %}
 
 
-<!-- Property Info -->
-<div class="row">
 
-<div class="col-md-6">
+<div class="row g-4">
 
-<ul class="list-group">
 
-<li class="list-group-item">
-<strong>Price:</strong> MWK {{ property.price }}
-</li>
+<!-- Left Column -->
+<div class="col-lg-8">
 
-<li class="list-group-item">
-<strong>Location:</strong> {{ property.location }}
-</li>
+<!-- Price + Status -->
+<div class="d-flex justify-content-between align-items-center mb-3">
 
-<li class="list-group-item">
-<strong>Bedrooms:</strong> {{ property.bedrooms }}
-</li>
+<div>
+<h3 class="fw-bold text-primary mb-0">
+MWK {{ property.price }}
+</h3>
 
-<li class="list-group-item">
-<strong>Bathrooms:</strong> {{ property.bathrooms }}
-</li>
-
-<li class="list-group-item">
-<strong>Description:</strong>
-<br>
-{{ property.description }}
-</li>
-
-</ul>
+<small class="text-muted">
+Posted {{ property.created_at|timesince }} ago
+</small>
 
 </div>
+
+<div>
+
+{% if property.is_available %}
+<span class="badge bg-success-subtle text-success px-3 py-2">
+<i class="bi bi-check-circle"></i>
+Available
+</span>
+{% else %}
+<span class="badge bg-danger-subtle text-danger px-3 py-2">
+<i class="bi bi-x-circle"></i>
+Occupied
+</span>
+{% endif %}
+
+</div>
+
+</div>
+
+
+
+<!-- Property Highlights -->
+<div class="row g-3 mb-4">
+
+<div class="col-6 col-md-3">
+<div class="p-3 border rounded text-center">
+
+<i class="bi bi-door-open fs-4"></i>
+
+<div class="fw-semibold mt-2">
+{{ property.bedrooms }}
+</div>
+
+<small class="text-muted">Bedrooms</small>
+
+</div>
+</div>
+
+
+<div class="col-6 col-md-3">
+<div class="p-3 border rounded text-center">
+
+<i class="bi bi-droplet fs-4"></i>
+
+<div class="fw-semibold mt-2">
+{{ property.bathrooms }}
+</div>
+
+<small class="text-muted">Bathrooms</small>
+
+</div>
+</div>
+
+
+<div class="col-6 col-md-3">
+<div class="p-3 border rounded text-center">
+
+<i class="bi bi-building fs-4"></i>
+
+<div class="fw-semibold mt-2">
+{{ property.property_type }}
+</div>
+
+<small class="text-muted">Type</small>
+
+</div>
+</div>
+
+
+<div class="col-6 col-md-3">
+<div class="p-3 border rounded text-center">
+
+<i class="bi bi-person fs-4"></i>
+
+<div class="fw-semibold mt-2">
+{{ property.owner.get_full_name }}
+</div>
+
+<small class="text-muted">Landlord</small>
+
+</div>
+</div>
+
+</div>
+
+
+
+<!-- Description -->
+<div class="mb-4">
+
+<h5 class="fw-bold mb-2">
+Description
+</h5>
+
+<p class="text-muted">
+{{ property.description }}
+</p>
+
+</div>
+
 
 
 <!-- Map -->
-<div class="col-md-6">
-
 {% if property.latitude and property.longitude %}
 
-<div id="map" style="height:350px;" class="rounded"></div>
+<div class="mb-4">
+
+<h5 class="fw-bold mb-3">
+Location
+</h5>
+
+<div id="map" 
+class="rounded shadow-sm" 
+style="height:350px;"></div>
+
+</div>
 
 <script>
-function initMap() {
-    var location = {
-        lat: {{ property.latitude }},
-        lng: {{ property.longitude }}
-    };
 
-    var map = new google.maps.Map(
-        document.getElementById("map"), {
-        zoom: 15,
-        center: location
-    });
+document.addEventListener("DOMContentLoaded", function() {
 
-    var marker = new google.maps.Marker({
-        position: location,
-        map: map
-    });
-}
-</script>
+var map = L.map('map').setView([
+{{ property.latitude }},
+{{ property.longitude }}
+], 15);
 
-<script async defer
-src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&callback=initMap">
+L.tileLayer(
+'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+maxZoom: 19,
+}).addTo(map);
+
+L.marker([
+{{ property.latitude }},
+{{ property.longitude }}
+]).addTo(map);
+
+});
+
 </script>
 
 {% endif %}
+
+</div>
+
+
+
+<!-- Right Column -->
+<div class="col-lg-4">
+
+<div class="border rounded p-4 sticky-top bg-white" style="top:100px;">
+
+
+<h5 class="fw-bold mb-3">
+Contact Landlord
+</h5>
+
+
+<div class="d-grid gap-2">
+
+<button class="btn btn-primary btn-lg">
+<i class="bi bi-telephone"></i>
+Call
+</button>
+
+<button class="btn btn-outline-primary">
+<i class="bi bi-chat"></i>
+Message
+</button>
+
+<button class="btn btn-outline-danger">
+<i class="bi bi-heart"></i>
+Save Property
+</button>
+
+</div>
+
+
+<hr>
+
+
+<div class="text-muted small">
+
+<div class="mb-2">
+<i class="bi bi-calendar"></i>
+Posted {{ property.created_at|date:"M d, Y" }}
+</div>
+
+<div>
+<i class="bi bi-person"></i>
+{{ property.owner.get_full_name }}
+</div>
+
+</div>
+
+
+</div>
 
 </div>
 

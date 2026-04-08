@@ -1,52 +1,176 @@
-{% load static %}
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Bluohm</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="{% static 'properties/css/app.css' %}">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>Bluohm</title>
+
+<!-- Bootstrap -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<!-- Bootstrap Icons -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+
+<!-- Leaflet Maps -->
+<link 
+rel="stylesheet" 
+href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+/>
+
+<style>
+
+body {
+background: #f8f9fa;
+}
+
+.sidebar {
+width: 260px;
+height: 100vh;
+position: fixed;
+background: white;
+border-right: 1px solid #eee;
+padding-top: 20px;
+}
+
+.sidebar a {
+padding: 12px 20px;
+display: block;
+color: #333;
+text-decoration: none;
+}
+
+.sidebar a:hover {
+background: #f5f5f5;
+}
+
+.main-content {
+margin-left: 260px;
+padding: 20px;
+}
+
+@media (max-width: 991px) {
+
+.sidebar {
+left: -260px;
+transition: 0.3s;
+}
+
+.sidebar.show {
+left: 0;
+}
+
+.main-content {
+margin-left: 0;
+}
+
+}
+
+</style>
+
 </head>
+
 <body>
 
-<div class="navbar">
-    <span class="menu-btn" onclick="toggleSidebar()">☰</span>
-    <span class="logo">Bluohm</span>
-    <span onclick="toggleTheme()">🌙</span>
+
+<!-- Sidebar -->
+<div class="sidebar" id="sidebar">
+
+<div class="px-3 mb-4">
+
+<h4 class="fw-bold">
+Bluohm
+</h4>
+
 </div>
 
-<div id="sidebar" class="sidebar">
-    <a href="/properties/">🏠 Marketplace</a>
-    {% if user.role == 'landlord' %}
-    <a href="/properties/add/">➕ Add Property</a>
-    {% endif %}
-    <a href="/accounts/logout/">🚪 Logout</a>
+
+<a href="#">
+<i class="bi bi-speedometer2 me-2"></i>
+Dashboard
+</a>
+
+<a href="#">
+<i class="bi bi-buildings me-2"></i>
+Properties
+</a>
+
+<a href="#">
+<i class="bi bi-people me-2"></i>
+Tenants
+</a>
+
+<a href="#">
+<i class="bi bi-cash-stack me-2"></i>
+Payments
+</a>
+
+<a href="#">
+<i class="bi bi-heart me-2"></i>
+Favorites
+</a>
+
+<a href="#">
+<i class="bi bi-gear me-2"></i>
+Settings
+</a>
+
+
 </div>
 
-<div id="overlay" class="overlay" onclick="toggleSidebar()"></div>
 
+
+<!-- Main Content -->
 <div class="main-content">
-    {% block content %}{% endblock %}
+
+
+<!-- Top Navbar -->
+<div class="d-flex justify-content-between align-items-center mb-4">
+
+<button class="btn btn-light d-lg-none" onclick="toggleSidebar()">
+<i class="bi bi-list fs-4"></i>
+</button>
+
+
+<div class="fw-semibold">
+Landlord Dashboard
 </div>
 
-<script>
-function toggleSidebar() {
-    sidebar.classList.toggle("active");
-    overlay.classList.toggle("active");
-}
 
-const sidebar = document.getElementById("sidebar");
-const overlay = document.getElementById("overlay");
+<div>
 
-function toggleTheme() {
-    document.body.classList.toggle("dark");
-    localStorage.setItem("theme",
-        document.body.classList.contains("dark") ? "dark" : "light");
-}
+<i class="bi bi-person-circle fs-4"></i>
 
-if (localStorage.getItem("theme") === "dark") {
-    document.body.classList.add("dark");
-}
+</div>
+
+</div>
+
+
+{% block content %}
+
+{% endblock %}
+
+</div>
+
+
+
+<!-- Scripts -->
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script 
+src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js">
 </script>
 
+<script>
+
+function toggleSidebar() {
+document.getElementById("sidebar").classList.toggle("show");
+}
+
+</script>
+
+
 </body>
+
 </html>
