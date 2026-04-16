@@ -73,84 +73,33 @@ def login_view(request):
 
         try:
             user_obj = User.objects.get(email__iexact=email)
-            
-            user = authenticate(request, username=user_obj.username, password=password)
-
-            if user is not None:
-                login(request, user)
-
-                # Role-based redirect
-                role = getattr(user.profile, "role", None)
-
-                if role == "landlord":
-                    return redirect("properties:landlord_dashboard")
-                elif role == "agent":
-                    return redirect("properties:agent_dashboard")  # create this later if needed
-                else:
-                    return redirect("accounts:home")  # general user dashboard/homepage
-
-            else:
-                messages.error(request, "Invalid email or password")
-
-        except User.DoesNotExist:
-            messages.error(request, "Invalid email or password")
-
-    return render(request, "accounts/login.html")
-
-"""
-def login_view(request):
-    if request.method == "POST":
-        email = request.POST.get("email")
-        password = request.POST.get("password")
-
-        try:
-            user = User.objects.get(email=email)
-            user = authenticate(request, username=user.username, password=password)
-
-            if user is not None:
-                login(request, user)
-
-                # Role Based Redirect
-                if user.profile.role == "landlord":
-                    return redirect("landlord_dashboard")
-                else:
-                    return redirect("tenant_dashboard")
-
-            else:
-                messages.error(request, "Invalid credentials")
-
-        except User.DoesNotExist:
-            messages.error(request, "User does not exist")
-
-    return render(request, "accounts/login.html")
-"""
-'''
-def login_view(request):
-    if request.method == "POST":
-        email = request.POST.get("email").strip().lower()
-        password = request.POST.get("password")
-
-        try:
-            user = User.objects.get(email__iexact=email)
 
             user = authenticate(
                 request,
-                username=user.username,
+                username=user_obj.username,
                 password=password
             )
 
             if user is not None:
                 login(request, user)
 
-                # Role Based Redirect
-                if user.profile.role == "landlord":
+                role = getattr(
+                    getattr(user, "profile", None),
+                    "role",
+                    "tenant"
+                )
+
+                if role == "landlord":
                     return redirect("properties:landlord_dashboard")
 
-                elif user.profile.role == "agent":
-                    return redirect("properties:landlord_dashboard")
+                elif role == "agent":
+                    return redirect("properties:agent_dashboard")
+
+                elif role == "tenant":
+                    return redirect("marketplace:marketplace")
 
                 else:
-                    return redirect("accounts:dashboard")
+                    return redirect("marketplace:marketplace")
 
             else:
                 messages.error(request, "Invalid email or password")
@@ -159,7 +108,7 @@ def login_view(request):
             messages.error(request, "Invalid email or password")
 
     return render(request, "accounts/login.html")
-'''
+
 @login_required
 def dashboard_view(request):
 
@@ -179,5 +128,5 @@ def dashboard_view(request):
 def logout_view(request):
 
     logout(request)
-    messages.info(request, "You have been logged out.")
+    # messages.info(request, "You have been logged out.")
     return redirect("accounts:login")

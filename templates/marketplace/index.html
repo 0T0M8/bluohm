@@ -1,0 +1,158 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<style>
+
+.property-card {
+border-radius: 16px;
+overflow: hidden;
+transition: 0.3s;
+box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+background: white;
+}
+
+.property-card:hover {
+transform: translateY(-5px);
+box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+}
+
+.property-image {
+height: 220px;
+object-fit: cover;
+}
+
+.price {
+font-size: 18px;
+font-weight: 600;
+}
+
+.location {
+color: #777;
+font-size: 14px;
+}
+
+.features {
+font-size: 14px;
+display: flex;
+gap: 15px;
+}
+
+.badge-type {
+position: absolute;
+top: 10px;
+left: 10px;
+}
+
+.favorite-btn {
+position: absolute;
+top: 10px;
+right: 10px;
+background: white;
+border-radius: 50%;
+padding: 5px 8px;
+}
+
+.tab-btn {
+border-radius: 50px;
+}
+
+</style>
+
+<div class="container py-4">
+
+<!-- Header -->
+<div class="d-flex justify-content-between align-items-center mb-3">
+
+<h3>Explore Properties</h3>
+
+</div>
+
+
+<!-- Rent / Buy Tabs -->
+<div class="mb-4">
+
+<button class="btn btn-dark tab-btn me-2">
+Rent
+</button>
+
+<button class="btn btn-outline-dark tab-btn">
+Buy
+</button>
+
+</div>
+
+
+<!-- Property Grid -->
+<div class="row">
+
+{% for property in properties %}
+
+<div class="col-lg-3 col-md-6 mb-4">
+
+<div class="card property-card">
+
+<div class="position-relative">
+
+<img src="{{ property.image.url }}" 
+class="card-img-top property-image">
+
+<span class="badge bg-dark badge-type">
+{{ property.property_type }}
+</span>
+
+<div class="favorite-btn">
+<i class="bi bi-heart"></i>
+</div>
+
+</div>
+
+<div class="card-body">
+
+<div class="price">
+MK {{ property.price }}
+</div>
+
+<h6>
+{{ property.title }}
+</h6>
+
+<div class="location">
+<i class="bi bi-geo-alt"></i>
+{{ property.location }}
+</div>
+
+<div class="features mt-2">
+
+<div>
+<i class="bi bi-door-open"></i>
+{{ property.bedrooms }}
+</div>
+
+<div>
+<i class="bi bi-droplet"></i>
+{{ property.bathrooms }}
+</div>
+
+</div>
+
+<a href="{% url 'marketplace:property_detail' property.id %}"
+class="btn btn-dark w-100 mt-3">
+
+View Property
+
+</a>
+
+</div>
+
+</div>
+
+</div>
+
+{% endfor %}
+
+</div>
+
+</div>
+
+{% endblock %}

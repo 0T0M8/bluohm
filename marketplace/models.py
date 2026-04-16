@@ -20,23 +20,25 @@ PROPERTY_CATEGORY = (
 
 class Property(models.Model):
 
-    owner = models.ForeignKey(User, on_delete=models.CASCADE)
+    landlord = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE
+    )
 
     title = models.CharField(max_length=255)
 
-    price = models.DecimalField(max_digits=10, decimal_places=2)
+    description = models.TextField()
 
-    bedrooms = models.IntegerField(default=0)
-
-    bathrooms = models.IntegerField(default=0)
+    price = models.DecimalField(
+        max_digits=10,
+        decimal_places=2
+    )
 
     location = models.CharField(max_length=255)
 
-    latitude = models.FloatField(null=True, blank=True)
+    bedrooms = models.IntegerField()
 
-    longitude = models.FloatField(null=True, blank=True)
-
-    landmarks = models.TextField(blank=True, null=True)
+    bathrooms = models.IntegerField()
 
     listing_type = models.CharField(
         max_length=10,
@@ -55,15 +57,5 @@ class Property(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return self.title
+        return self.titlefrom django.db import models
 
-
-class PropertyImage(models.Model):
-
-    property = models.ForeignKey(
-        Property,
-        related_name="images",
-        on_delete=models.CASCADE
-    )
-
-    image = models.ImageField(upload_to="properties/")
