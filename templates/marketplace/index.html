@@ -19,6 +19,7 @@ box-shadow: 0 15px 30px rgba(0,0,0,0.1);
 
 .property-image {
 height: 220px;
+width: 100%;
 object-fit: cover;
 }
 
@@ -86,6 +87,8 @@ Buy
 <!-- Property Grid -->
 <div class="row">
 
+{% if properties %}
+
 {% for property in properties %}
 
 <div class="col-lg-3 col-md-6 mb-4">
@@ -94,11 +97,19 @@ Buy
 
 <div class="position-relative">
 
-<img src="{{ property.image.url }}" 
-class="card-img-top property-image">
+{% with property.images.all|first as img %}
+    {% if img %}
+        <img src="{{ img.image.url }}"
+        class="card-img-top property-image">
+    {% else %}
+        <div class="property-image bg-light d-flex align-items-center justify-content-center">
+            <span class="text-muted">No Image</span>
+        </div>
+    {% endif %}
+{% endwith %}
 
 <span class="badge bg-dark badge-type">
-{{ property.property_type }}
+{{ property.get_listing_type_display }}
 </span>
 
 <div class="favorite-btn">
@@ -136,7 +147,7 @@ MK {{ property.price }}
 
 </div>
 
-<a href="{% url 'marketplace:property_detail' property.id %}"
+<a href="{% url 'properties:property_detail' property.id %}"
 class="btn btn-dark w-100 mt-3">
 
 View Property
@@ -150,6 +161,20 @@ View Property
 </div>
 
 {% endfor %}
+
+{% else %}
+
+<div class="text-center py-5">
+
+<h4>No properties available</h4>
+
+<p class="text-muted">
+New listings will appear here
+</p>
+
+</div>
+
+{% endif %}
 
 </div>
 
