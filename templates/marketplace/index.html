@@ -5,44 +5,44 @@
 <style>
 
 .property-card {
-border-radius: 16px;
-overflow: hidden;
-transition: 0.3s;
-box-shadow: 0 5px 20px rgba(0,0,0,0.05);
-background: white;
+    border-radius: 16px;
+    overflow: hidden;
+    transition: 0.3s;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+    background: white;
 }
 
 .property-card:hover {
-transform: translateY(-5px);
-box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+    transform: translateY(-5px);
+    box-shadow: 0 15px 30px rgba(0,0,0,0.1);
 }
 
 .property-image {
-height: 220px;
-width: 100%;
-object-fit: cover;
+    height: 220px;
+    width: 100%;
+    object-fit: cover;
 }
 
 .price {
-font-size: 18px;
-font-weight: 600;
+    font-size: 18px;
+    font-weight: 600;
 }
 
 .location {
-color: #777;
-font-size: 14px;
+    color: #777;
+    font-size: 14px;
 }
 
 .features {
-font-size: 14px;
-display: flex;
-gap: 15px;
+    font-size: 14px;
+    display: flex;
+    gap: 15px;
 }
 
 .badge-type {
-position: absolute;
-top: 10px;
-left: 10px;
+    position: absolute;
+    top: 10px;
+    left: 10px;
 }
 
 .favorite-btn {
@@ -55,7 +55,7 @@ padding: 5px 8px;
 }
 
 .tab-btn {
-border-radius: 50px;
+    border-radius: 50px;
 }
 
 </style>
@@ -64,25 +64,14 @@ border-radius: 50px;
 
 <!-- Header -->
 <div class="d-flex justify-content-between align-items-center mb-3">
-
-<h3>Explore Properties</h3>
-
+    <h3>Explore Properties</h3>
 </div>
 
-
-<!-- Rent / Buy Tabs -->
+<!-- Rent / Buy Tabs (UI only for now) -->
 <div class="mb-4">
-
-<button class="btn btn-dark tab-btn me-2">
-Rent
-</button>
-
-<button class="btn btn-outline-dark tab-btn">
-Buy
-</button>
-
+    <button class="btn btn-dark tab-btn me-2">Rent</button>
+    <button class="btn btn-outline-dark tab-btn">Buy</button>
 </div>
-
 
 <!-- Property Grid -->
 <div class="row">
@@ -99,8 +88,7 @@ Buy
 
 {% with property.images.all|first as img %}
     {% if img %}
-        <img src="{{ img.image.url }}"
-        class="card-img-top property-image">
+        <img src="{{ img.image.url }}" class="card-img-top property-image">
     {% else %}
         <div class="property-image bg-light d-flex align-items-center justify-content-center">
             <span class="text-muted">No Image</span>
@@ -109,11 +97,14 @@ Buy
 {% endwith %}
 
 <span class="badge bg-dark badge-type">
-{{ property.get_listing_type_display }}
+    {{ property.get_listing_type_display }}
 </span>
 
 <div class="favorite-btn">
-<i class="bi bi-heart"></i>
+    <button onclick="toggleFavorite({{ property.id }})"
+            style="border:none; background:none;">
+        <i class="bi bi-heart" id="fav-icon-{{ property.id }}"></i>
+    </button>
 </div>
 
 </div>
@@ -121,37 +112,33 @@ Buy
 <div class="card-body">
 
 <div class="price">
-MK {{ property.price }}
+    MK {{ property.price }}
 </div>
 
 <h6>
-{{ property.title }}
+    {{ property.title }}
 </h6>
 
 <div class="location">
-<i class="bi bi-geo-alt"></i>
-{{ property.location }}
+    <i class="bi bi-geo-alt"></i>
+    {{ property.city }}, {{ property.area }}
 </div>
 
 <div class="features mt-2">
+    <div>
+        <i class="bi bi-door-open"></i>
+        {{ property.bedrooms }}
+    </div>
 
-<div>
-<i class="bi bi-door-open"></i>
-{{ property.bedrooms }}
-</div>
-
-<div>
-<i class="bi bi-droplet"></i>
-{{ property.bathrooms }}
-</div>
-
+    <div>
+        <i class="bi bi-droplet"></i>
+        {{ property.bathrooms }}
+    </div>
 </div>
 
 <a href="{% url 'properties:property_detail' property.id %}"
-class="btn btn-dark w-100 mt-3">
-
-View Property
-
+   class="btn btn-dark w-100 mt-3">
+    View Property
 </a>
 
 </div>
@@ -165,13 +152,10 @@ View Property
 {% else %}
 
 <div class="text-center py-5">
-
-<h4>No properties available</h4>
-
-<p class="text-muted">
-New listings will appear here
-</p>
-
+    <h4>No properties available</h4>
+    <p class="text-muted">
+        New listings will appear here
+    </p>
 </div>
 
 {% endif %}
@@ -179,5 +163,29 @@ New listings will appear here
 </div>
 
 </div>
+
+<!-- FAVORITES SCRIPT -->
+<script>
+function toggleFavorite(propertyId) {
+    fetch(`/properties/favorite/${propertyId}/`, {
+        method: "POST",
+        headers: {
+            "X-CSRFToken": "{{ csrf_token }}",
+        }
+    })
+    .then(res => res.json())
+    .then(data => {
+        const icon = document.getElementById(`fav-icon-${propertyId}`);
+
+        if (data.status === "added") {
+            icon.classList.remove("bi-heart");
+            icon.classList.add("bi-heart-fill");
+        } else {
+            icon.classList.remove("bi-heart-fill");
+            icon.classList.add("bi-heart");
+        }
+    });
+}
+</script>
 
 {% endblock %}

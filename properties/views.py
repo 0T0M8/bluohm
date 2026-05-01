@@ -1,6 +1,7 @@
+from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, get_object_or_404
-from .models import Property, PropertyImage
+from .models import Property, PropertyImage, Favorite
 from .forms import PropertyForm
 
 @login_required
@@ -77,3 +78,22 @@ def property_detail(request, property_id):
         'images': images,
     }
     return render(request, 'properties/property_detail.html', context)
+
+@login_required
+def toggle_favorite(request, property_id):
+
+    if request.method == "POST":
+        property_obj = get_object_or_404(Property, id=property_id)
+
+        favorite, created = Favorite.objects.get_or_create(
+            user=request.user,
+            property=property_obj
+        )
+
+        if not created:
+            favorite.delete()
+            return JsonResponse({"status": "removed"})
+
+        return JsonResponse({"status": "added"})
+
+    return JsonResponse({"error": "Invalid request"}, status=400)

@@ -67,3 +67,10 @@ class PropertyImage(models.Model):
     )
 
     image = models.ImageField(upload_to="properties/")
+
+class Favorite(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    property = models.ForeignKey(Property, on_delete=models.CASCADE)
+
+    class Meta:
+        unique_together = ('user', 'property')
