@@ -139,9 +139,10 @@ Tenants
 Payments
 </a>
 
-<a href="#">
-<i class="bi bi-heart"></i>
-Favorites
+<a href="{% url 'properties:favorites_list' %}"
+   class="{% if request.path == '/properties/favorites/' %}active{% endif %}">
+    <i class="bi bi-heart"></i>
+    Favorites
 </a>
 
 <a href="#">

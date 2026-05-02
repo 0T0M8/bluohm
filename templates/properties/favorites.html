@@ -1,0 +1,120 @@
+<!-- templates/properties/favorites.html -->
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container py-4">
+
+<h3 class="mb-4">
+    <i class="bi bi-heart-fill text-danger"></i>
+    Saved Properties
+</h3>
+
+<div class="row">
+
+{% if properties %}
+
+{% for property in properties %}
+
+<div class="col-lg-3 col-md-6 mb-4">
+
+<div class="card property-card">
+
+<div class="position-relative">
+
+{% with property.images.all|first as img %}
+    {% if img %}
+        <img src="{{ img.image.url }}" class="card-img-top property-image">
+    {% else %}
+        <div class="property-image bg-light d-flex align-items-center justify-content-center">
+            <span class="text-muted">No Image</span>
+        </div>
+    {% endif %}
+{% endwith %}
+
+<span class="badge bg-dark badge-type">
+    {{ property.get_listing_type_display }}
+</span>
+
+<div class="favorite-btn">
+    <button onclick="toggleFavorite({{ property.id }})"
+            style="border:none; background:none;">
+        <i class="bi bi-heart-fill" id="fav-icon-{{ property.id }}"></i>
+    </button>
+</div>
+
+</div>
+
+<div class="card-body">
+
+<div class="price">
+    MK {{ property.price }}
+</div>
+
+<h6>{{ property.title }}</h6>
+
+<div class="location">
+    <i class="bi bi-geo-alt"></i>
+    {{ property.city }}, {{ property.area }}
+</div>
+
+<div class="features mt-2">
+    <div><i class="bi bi-door-open"></i> {{ property.bedrooms }}</div>
+    <div><i class="bi bi-droplet"></i> {{ property.bathrooms }}</div>
+</div>
+
+<a href="{% url 'properties:property_detail' property.id %}"
+   class="btn btn-dark w-100 mt-3">
+    View Property
+</a>
+
+</div>
+
+</div>
+
+</div>
+
+{% endfor %}
+
+{% else %}
+
+<div class="text-center py-5">
+    <h4>No saved properties yet</h4>
+    <p class="text-muted">Start exploring and save your favorites 
+        <i class="bi bi-heart-fill text-danger"></i> 
+    </p>
+</div>
+
+{% endif %}
+
+</div>
+
+</div>
+
+<!-- Reuse SAME JS -->
+<script>
+function getCSRFToken() {
+    return document.cookie.split('; ')
+        .find(row => row.startsWith('csrftoken'))
+        ?.split('=')[1];
+}
+
+function toggleFavorite(propertyId) {
+    fetch(`/properties/favorite/${propertyId}/`, {
+        method: "POST",
+        headers: {
+            "X-CSRFToken": getCSRFToken(),
+        }
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.status === "removed") {
+            location.reload(); // remove from page instantly
+        }
+    });
+}
+</script>
+
+{% endblock %}
+
+

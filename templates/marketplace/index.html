@@ -1,9 +1,10 @@
+<!-- templates/marketplace/index.html -->
+
 {% extends "base.html" %}
 
 {% block content %}
 
 <style>
-
 .property-card {
     border-radius: 16px;
     overflow: hidden;
@@ -11,53 +12,44 @@
     box-shadow: 0 5px 20px rgba(0,0,0,0.05);
     background: white;
 }
-
 .property-card:hover {
     transform: translateY(-5px);
     box-shadow: 0 15px 30px rgba(0,0,0,0.1);
 }
-
 .property-image {
     height: 220px;
     width: 100%;
     object-fit: cover;
 }
-
 .price {
     font-size: 18px;
     font-weight: 600;
 }
-
 .location {
     color: #777;
     font-size: 14px;
 }
-
 .features {
     font-size: 14px;
     display: flex;
     gap: 15px;
 }
-
 .badge-type {
     position: absolute;
     top: 10px;
     left: 10px;
 }
-
 .favorite-btn {
-position: absolute;
-top: 10px;
-right: 10px;
-background: white;
-border-radius: 50%;
-padding: 5px 8px;
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: white;
+    border-radius: 50%;
+    padding: 6px 10px;
 }
-
 .tab-btn {
     border-radius: 50px;
 }
-
 </style>
 
 <div class="container py-4">
@@ -80,7 +72,7 @@ padding: 5px 8px;
 
 {% for property in properties %}
 
-<div class="col-lg-3 col-md-6 mb-4">
+<div class="col-lg-3 col-md-6 mb-4" id="property-card-{{ property.id }}">
 
 <div class="card property-card">
 
@@ -100,10 +92,20 @@ padding: 5px 8px;
     {{ property.get_listing_type_display }}
 </span>
 
+<!-- Favorite Button -->
 <div class="favorite-btn">
     <button onclick="toggleFavorite({{ property.id }})"
             style="border:none; background:none;">
-        <i class="bi bi-heart" id="fav-icon-{{ property.id }}"></i>
+
+        <i class="bi
+        {% if property.id in favorite_ids %}
+            bi-heart-fill text-danger
+        {% else %}
+            bi-heart
+        {% endif %}
+        "
+        id="fav-icon-{{ property.id }}"></i>
+
     </button>
 </div>
 
@@ -115,9 +117,7 @@ padding: 5px 8px;
     MK {{ property.price }}
 </div>
 
-<h6>
-    {{ property.title }}
-</h6>
+<h6>{{ property.title }}</h6>
 
 <div class="location">
     <i class="bi bi-geo-alt"></i>
@@ -125,15 +125,8 @@ padding: 5px 8px;
 </div>
 
 <div class="features mt-2">
-    <div>
-        <i class="bi bi-door-open"></i>
-        {{ property.bedrooms }}
-    </div>
-
-    <div>
-        <i class="bi bi-droplet"></i>
-        {{ property.bathrooms }}
-    </div>
+    <div><i class="bi bi-door-open"></i> {{ property.bedrooms }}</div>
+    <div><i class="bi bi-droplet"></i> {{ property.bathrooms }}</div>
 </div>
 
 <a href="{% url 'properties:property_detail' property.id %}"
@@ -153,9 +146,7 @@ padding: 5px 8px;
 
 <div class="text-center py-5">
     <h4>No properties available</h4>
-    <p class="text-muted">
-        New listings will appear here
-    </p>
+    <p class="text-muted">New listings will appear here</p>
 </div>
 
 {% endif %}
@@ -164,13 +155,22 @@ padding: 5px 8px;
 
 </div>
 
-<!-- FAVORITES SCRIPT -->
+<!-- ============================= -->
+<!-- FAVORITES REAL-TIME SCRIPT -->
+<!-- ============================= -->
+
 <script>
+function getCSRFToken() {
+    return document.cookie.split('; ')
+        .find(row => row.startsWith('csrftoken'))
+        ?.split('=')[1];
+}
+
 function toggleFavorite(propertyId) {
     fetch(`/properties/favorite/${propertyId}/`, {
         method: "POST",
         headers: {
-            "X-CSRFToken": "{{ csrf_token }}",
+            "X-CSRFToken": getCSRFToken(),
         }
     })
     .then(res => res.json())
@@ -179,11 +179,14 @@ function toggleFavorite(propertyId) {
 
         if (data.status === "added") {
             icon.classList.remove("bi-heart");
-            icon.classList.add("bi-heart-fill");
+            icon.classList.add("bi-heart-fill", "text-danger");
         } else {
-            icon.classList.remove("bi-heart-fill");
+            icon.classList.remove("bi-heart-fill", "text-danger");
             icon.classList.add("bi-heart");
         }
+    })
+    .catch(err => {
+        console.error("Favorite toggle failed:", err);
     });
 }
 </script>

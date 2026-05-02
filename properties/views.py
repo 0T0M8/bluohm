@@ -97,3 +97,13 @@ def toggle_favorite(request, property_id):
         return JsonResponse({"status": "added"})
 
     return JsonResponse({"error": "Invalid request"}, status=400)
+
+@login_required
+def favorites_list(request):
+    favorites = Favorite.objects.filter(user=request.user).select_related('property')
+
+    properties = [fav.property for fav in favorites]
+
+    return render(request, "properties/favorites.html", {
+        "properties": properties
+    })
