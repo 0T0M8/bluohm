@@ -6,44 +6,53 @@
 
 <div class="container py-4">
 
-<h4 class="mb-3">
-    Chat about: {{ conversation.property.title }}
-</h4>
+<!-- Header -->
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h5 class="mb-0">
+        Chat about: <strong>{{ conversation.property.title }}</strong>
+    </h5>
+</div>
 
-<div class="border rounded p-3 mb-3" style="height: 400px; overflow-y: auto;">
+<!-- Chat Box -->
+<div id="chat-box"
+     class="border rounded p-3 mb-3 bg-white"
+     style="height: 420px; overflow-y: auto;">
 
-{% for msg in messages %}
-
-<div class="mb-2 
-{% if msg.sender == request.user %}text-end{% endif %}">
-
-    <div class="d-inline-block p-2 rounded 
-    {% if msg.sender == request.user %}
-        bg-dark text-white
-    {% else %}
-        bg-light
-    {% endif %}
-    ">
-        {{ msg.content }}
+    {% for msg in messages %}
+    <div class="mb-2 {% if msg.sender == request.user %}text-end{% endif %}">
+        <div class="d-inline-block px-3 py-2 rounded
+            {% if msg.sender == request.user %}
+                bg-dark text-white
+            {% else %}
+                bg-light
+            {% endif %}
+        ">
+            {{ msg.content }}
+        </div>
     </div>
+    {% endfor %}
 
 </div>
 
-{% endfor %}
-
-</div>
-
-<!-- Ajax Form Reloads Chat -->
+<!-- Message Input -->
 <form id="chat-form">
     {% csrf_token %}
     <div class="input-group">
-        <input type="text" id="message-input"
+        <input type="text"
+               id="message-input"
                class="form-control"
-               placeholder="Type a message..." required>
+               placeholder="Type a message..."
+               autocomplete="off"
+               required>
         <button class="btn btn-dark">Send</button>
     </div>
 </form>
+
 </div>
+
+<!-- ============================= -->
+<!-- REAL-TIME CHAT SCRIPT -->
+<!-- ============================= -->
 
 <script>
 const form = document.getElementById("chat-form");
@@ -56,8 +65,12 @@ function getCSRFToken() {
         ?.split('=')[1];
 }
 
+// SEND MESSAGE (AJAX)
 form.addEventListener("submit", function(e) {
     e.preventDefault();
+
+    const message = input.value.trim();
+    if (!message) return;
 
     fetch("", {
         method: "POST",
@@ -65,25 +78,17 @@ form.addEventListener("submit", function(e) {
             "X-CSRFToken": getCSRFToken(),
             "Content-Type": "application/x-www-form-urlencoded"
         },
-        body: `content=${encodeURIComponent(input.value)}`
+        body: `content=${encodeURIComponent(message)}`
     })
     .then(res => res.text())
     .then(() => {
-        // append message instantly
-        const msgHTML = `
-        <div class="mb-2 text-end">
-            <div class="d-inline-block p-2 rounded bg-dark text-white">
-                ${input.value}
-            </div>
-        </div>
-        `;
-        chatBox.innerHTML += msgHTML;
-
         input.value = "";
-        chatBox.scrollTop = chatBox.scrollHeight;
-    });
+        loadMessages();
+    })
+    .catch(err => console.error("Send failed:", err));
 });
 
+// LOAD MESSAGES (POLLING)
 function loadMessages() {
     fetch("/messages/fetch/{{ conversation.id }}/")
     .then(res => res.json())
@@ -93,7 +98,7 @@ function loadMessages() {
         data.messages.forEach(msg => {
             html += `
             <div class="mb-2 ${msg.is_me ? 'text-end' : ''}">
-                <div class="d-inline-block p-2 rounded 
+                <div class="d-inline-block px-3 py-2 rounded
                     ${msg.is_me ? 'bg-dark text-white' : 'bg-light'}">
                     ${msg.content}
                 </div>
@@ -103,12 +108,15 @@ function loadMessages() {
 
         chatBox.innerHTML = html;
         chatBox.scrollTop = chatBox.scrollHeight;
-    });
+    })
+    .catch(err => console.error("Load failed:", err));
 }
 
-// refresh every 2 seconds
-setInterval(loadMessages, 2000);
+// INITIAL LOAD
+loadMessages();
 
+// POLLING EVERY 2s
+setInterval(loadMessages, 2000);
 </script>
 
 {% endblock %}
