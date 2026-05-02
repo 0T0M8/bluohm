@@ -232,6 +232,33 @@ L.marker([
 
 });
 
+function getCSRFToken() {
+    return document.cookie.split('; ')
+        .find(row => row.startsWith('csrftoken'))
+        ?.split('=')[1];
+}
+
+function toggleFavorite(propertyId) {
+    fetch(`/properties/favorite/${propertyId}/`, {
+        method: "POST",
+        headers: {
+            "X-CSRFToken": getCSRFToken(),
+        }
+    })
+    .then(res => res.json())
+    .then(data => {
+        const icon = document.getElementById(`fav-icon-${propertyId}`);
+
+        if (data.status === "added") {
+            icon.classList.remove("bi-heart");
+            icon.classList.add("bi-heart-fill");
+        } else {
+            icon.classList.remove("bi-heart-fill");
+            icon.classList.add("bi-heart");
+        }
+    });
+}
+
 </script>
 
 {% endif %}
@@ -258,14 +285,27 @@ Contact Landlord
 Call
 </button>
 
-<button class="btn btn-outline-primary">
-<i class="bi bi-chat"></i>
-Message
-</button>
+<!-- Link To Start Chat -->
+<a href="{% url 'messaging:start' property.id %}" 
+   class="btn btn-outline-primary">
+    <i class="bi bi-chat"></i>
+    Message
+</a>
 
-<button class="btn btn-outline-danger">
-<i class="bi bi-heart"></i>
-Save Property
+<!-- Dynamic Save Property Button -->
+<button onclick="toggleFavorite({{ property.id }})"
+        class="btn btn-outline-danger">
+
+    <i class="bi 
+    {% if property.id in favorite_ids %}
+        bi-heart-fill
+    {% else %}
+        bi-heart
+    {% endif %}
+    "
+    id="fav-icon-{{ property.id }}"></i>
+
+    Save Property
 </button>
 
 </div>

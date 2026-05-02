@@ -15,4 +15,5 @@ urlpatterns = [
     path("dashboard/", dashboard_view),
     path("properties/", include("properties.urls")),
     path("marketplace/", include("marketplace.urls")),
+    path("messages/", include("messaging.urls")),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
