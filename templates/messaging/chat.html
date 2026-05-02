@@ -51,7 +51,7 @@
 </div>
 
 <!-- ============================= -->
-<!-- REAL-TIME CHAT SCRIPT -->
+<!-- SMART REAL-TIME CHAT SCRIPT -->
 <!-- ============================= -->
 
 <script>
@@ -59,13 +59,20 @@ const form = document.getElementById("chat-form");
 const input = document.getElementById("message-input");
 const chatBox = document.getElementById("chat-box");
 
+let lastMessageId = 0;
+let isActive = true;
+
 function getCSRFToken() {
     return document.cookie.split('; ')
         .find(row => row.startsWith('csrftoken'))
         ?.split('=')[1];
 }
 
-// SEND MESSAGE (AJAX)
+// TRACK USER ACTIVITY (optional optimization)
+window.onfocus = () => isActive = true;
+window.onblur = () => isActive = false;
+
+// SEND MESSAGE
 form.addEventListener("submit", function(e) {
     e.preventDefault();
 
@@ -83,16 +90,26 @@ form.addEventListener("submit", function(e) {
     .then(res => res.text())
     .then(() => {
         input.value = "";
-        loadMessages();
+        loadMessages(true); // force refresh after send
     })
     .catch(err => console.error("Send failed:", err));
 });
 
-// LOAD MESSAGES (POLLING)
-function loadMessages() {
+// LOAD MESSAGES (SMART POLLING)
+function loadMessages(force=false) {
+    if (!isActive && !force) return;
+
     fetch("/messages/fetch/{{ conversation.id }}/")
     .then(res => res.json())
     .then(data => {
+
+        // 🚀 skip update if nothing new
+        if (!force && data.last_id === lastMessageId) {
+            return;
+        }
+
+        lastMessageId = data.last_id;
+
         let html = "";
 
         data.messages.forEach(msg => {
@@ -113,10 +130,11 @@ function loadMessages() {
 }
 
 // INITIAL LOAD
-loadMessages();
+loadMessages(true);
 
-// POLLING EVERY 2s
-setInterval(loadMessages, 2000);
+// SMART POLLING (LESS AGGRESSIVE)
+setInterval(() => loadMessages(), 5000);
+
 </script>
 
 {% endblock %}
