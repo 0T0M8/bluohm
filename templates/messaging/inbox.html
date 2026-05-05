@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container py-4">
+
+<h4 class="mb-4">📬 Inbox</h4>
+
+{% if inbox_data %}
+
+<div class="list-group">
+
+    {% for item in inbox_data %}
+
+    <a href="{% url 'messaging:chat' item.conversation.id %}"
+       class="list-group-item list-group-item-action">
+
+        <div class="d-flex justify-content-between">
+
+            <div>
+                <strong>
+                    {{ item.conversation.property.title }}
+                </strong>
+
+                <div class="text-muted small">
+                    {% if item.last_message %}
+                        {{ item.last_message.content|truncatechars:50 }}
+                    {% else %}
+                        No messages yet
+                    {% endif %}
+                </div>
+            </div>
+
+        </div>
+
+    </a>
+
+    {% endfor %}
+
+</div>
+
+{% else %}
+
+<div class="text-center text-muted py-5">
+    No conversations yet
+</div>
+
+{% endif %}
+
+</div>
+
+{% endblock %}

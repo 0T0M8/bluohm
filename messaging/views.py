@@ -44,7 +44,7 @@ def chat_view(request, conversation_id):
 
         return redirect("messaging:chat", conversation.id)
 
-    messages = conversation.messages.all().order_by("timestamp")
+    messages = conversation.messages.all().order_by("-created_at")
 
     return render(request, "messaging/chat.html", {
         "conversation": conversation,
@@ -55,7 +55,7 @@ def chat_view(request, conversation_id):
 def fetch_messages(request, conversation_id):
     conversation = get_object_or_404(Conversation, id=conversation_id)
 
-    messages = conversation.messages.all().order_by("timestamp")
+    messages = conversation.messages.all().order_by("-created_at")
 
     data = [
         {
@@ -67,3 +67,26 @@ def fetch_messages(request, conversation_id):
     ]
 
     return JsonResponse({"messages": data})
+
+@login_required
+def inbox(request):
+    conversations = Conversation.objects.filter(
+        participants=request.user
+    ).order_by("-updated_at")
+
+    inbox_data = []
+
+    for convo in conversations:
+        last_message = Message.objects.filter(
+            conversation=convo
+        ).order_by("-created_at").first()
+
+        inbox_data.append({
+            "conversation": convo,
+            "last_message": last_message
+        })
+
+    return render(request, "messaging/inbox.html", {
+        "inbox_data": inbox_data
+    })
+

@@ -139,6 +139,11 @@ Tenants
 Payments
 </a>
 
+<a href="{% url 'messaging:inbox' %}">
+    <i class="bi bi-chat-dots"></i>
+    Messages
+</a>
+
 <a href="{% url 'properties:favorites_list' %}"
    class="{% if request.path == '/properties/favorites/' %}active{% endif %}">
     <i class="bi bi-heart"></i>
