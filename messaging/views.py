@@ -1,12 +1,18 @@
 # messaging/views.py
+
 from django.http import JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
-from .models import Conversation, Message
+from django.utils import timezone
+
+from .models import Conversation, Message, ConversationReadState
 from properties.models import Property
 
 
+# ================================
+# START CONVERSATION
+# ================================
 @login_required
 def start_conversation(request, property_id):
 
@@ -14,7 +20,11 @@ def start_conversation(request, property_id):
     landlord = property_obj.owner
     user = request.user
 
-    # check existing conversation
+    # Prevent self-chat
+    if landlord == user:
+        return redirect("properties:property_detail", property_id)
+
+    # Check existing conversation
     conversation = Conversation.objects.filter(
         property=property_obj,
         participants=user
@@ -27,66 +37,120 @@ def start_conversation(request, property_id):
     return redirect("messaging:chat", conversation.id)
 
 
+# ================================
+# CHAT VIEW
+# ================================
 @login_required
-def chat_view(request, conversation_id):
+def chat(request, conversation_id):
 
-    conversation = get_object_or_404(Conversation, id=conversation_id)
+    conversation = Conversation.objects.filter(
+        id=conversation_id,
+        participants=request.user
+    ).first()
 
+    if not conversation:
+        return redirect("messaging:inbox")
+
+    # ✅ MARK AS READ
+    read_state, _ = ConversationReadState.objects.get_or_create(
+        user=request.user,
+        conversation=conversation
+    )
+    read_state.last_read_at = timezone.now()
+    read_state.save()
+
+    # ✅ SEND MESSAGE (AJAX SAFE)
     if request.method == "POST":
         content = request.POST.get("content")
 
         if content:
-            Message.objects.create(
+            msg = Message.objects.create(
                 conversation=conversation,
                 sender=request.user,
                 content=content
             )
 
-        return redirect("messaging:chat", conversation.id)
+            return JsonResponse({
+                "status": "sent",
+                "message_id": msg.id
+            })
 
-    messages = conversation.messages.all().order_by("-created_at")
+    messages = conversation.messages.order_by("created_at")
 
     return render(request, "messaging/chat.html", {
         "conversation": conversation,
         "messages": messages
     })
 
-@login_required
-def fetch_messages(request, conversation_id):
-    conversation = get_object_or_404(Conversation, id=conversation_id)
 
-    messages = conversation.messages.all().order_by("-created_at")
-
-    data = [
-        {
-            "sender": msg.sender.username,
-            "content": msg.content,
-            "is_me": msg.sender == request.user
-        }
-        for msg in messages
-    ]
-
-    return JsonResponse({"messages": data})
-
+# ================================
+# INBOX
+# ================================
 @login_required
 def inbox(request):
-    conversations = Conversation.objects.filter(
-        participants=request.user
-    ).order_by("-updated_at")
 
-    inbox_data = []
+    user = request.user
+
+    conversations = Conversation.objects.filter(
+        participants=user
+    ).distinct()
+
+    convo_data = []
 
     for convo in conversations:
-        last_message = Message.objects.filter(
-            conversation=convo
-        ).order_by("-created_at").first()
 
-        inbox_data.append({
-            "conversation": convo,
-            "last_message": last_message
-        })
+        last_message = convo.messages.order_by("-created_at").first()
+
+        read_state = ConversationReadState.objects.filter(
+            user=user,
+            conversation=convo
+        ).first()
+
+        if read_state and read_state.last_read_at:
+            unread_count = convo.messages.filter(
+                created_at__gt=read_state.last_read_at
+            ).exclude(sender=user).count()
+        else:
+            unread_count = convo.messages.exclude(sender=user).count()
+
+        convo.last_message = last_message
+        convo.unread_count = unread_count
+
+        convo_data.append(convo)
 
     return render(request, "messaging/inbox.html", {
-        "inbox_data": inbox_data
+        "conversations": convo_data
     })
 
+
+# ================================
+# FETCH MESSAGES (REAL-TIME)
+# ================================
+@login_required
+def fetch_messages(request, conversation_id):
+
+    conversation = Conversation.objects.filter(
+        id=conversation_id,
+        participants=request.user
+    ).first()
+
+    if not conversation:
+        return JsonResponse({"error": "Unauthorized"}, status=403)
+
+    messages = conversation.messages.order_by("created_at")
+
+    data = []
+    last_id = 0
+
+    for msg in messages:
+        data.append({
+            "id": msg.id,
+            "content": msg.content,
+            "is_me": msg.sender == request.user
+        })
+        last_id = msg.id
+
+    return JsonResponse({
+        "messages": data,
+        "last_id": last_id
+    })

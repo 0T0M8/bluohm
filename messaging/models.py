@@ -30,3 +30,12 @@ class Message(models.Model):
 
     def __str__(self):
         return f"{self.sender} - {self.content[:30]}"
+
+class ConversationReadState(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    conversation = models.ForeignKey(Conversation, on_delete=models.CASCADE)
+
+    last_read_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        unique_together = ("user", "conversation")

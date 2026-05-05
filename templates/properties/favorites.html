@@ -10,9 +10,11 @@
     Saved Properties
 </h3>
 <!-- Favorites + Messages Combo-->
+{% if property.unread_messages > 0 %}
 <span class="badge bg-danger">
-2 new
+{{ property.unread_messages }} new
 </span>
+{% endif %}
 
 <div class="row">
 

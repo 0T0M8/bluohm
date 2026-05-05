@@ -114,7 +114,7 @@ function loadMessages(force=false) {
 
         data.messages.forEach(msg => {
             html += `
-            <div class="mb-2 ${msg.is_me ? 'text-end' : ''}">
+            <div data-id="${msg.id}" class="mb-2 ${msg.is_me ? 'text-end' : ''}">
                 <div class="d-inline-block px-3 py-2 rounded
                     ${msg.is_me ? 'bg-dark text-white' : 'bg-light'}">
                     ${msg.content}
