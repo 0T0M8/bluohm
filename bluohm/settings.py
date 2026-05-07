@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'accounts',
     'properties',
     'messaging',
+    'channels',
 ]
 
 MIDDLEWARE = [
@@ -72,8 +73,17 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = "bluohm.wsgi.application"
+#WSGI_APPLICATION = "bluohm.wsgi.application"
+ASGI_APPLICATION = "bluohm.asgi.application"
 
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [("127.0.0.1", 6379)],
+        },
+    },
+}
 
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases

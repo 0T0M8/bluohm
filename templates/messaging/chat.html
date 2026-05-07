@@ -47,94 +47,50 @@
         <button class="btn btn-dark">Send</button>
     </div>
 </form>
-
 </div>
 
-<!-- ============================= -->
-<!-- SMART REAL-TIME CHAT SCRIPT -->
-<!-- ============================= -->
-
 <script>
-const form = document.getElementById("chat-form");
-const input = document.getElementById("message-input");
 const chatBox = document.getElementById("chat-box");
+const input = document.getElementById("message-input");
+const form = document.getElementById("chat-form");
 
-let lastMessageId = 0;
-let isActive = true;
+const conversationId = "{{ conversation.id }}";
 
-function getCSRFToken() {
-    return document.cookie.split('; ')
-        .find(row => row.startsWith('csrftoken'))
-        ?.split('=')[1];
-}
+const socket = new WebSocket(
+    `ws://${window.location.host}/ws/chat/${conversationId}/`
+);
 
-// TRACK USER ACTIVITY (optional optimization)
-window.onfocus = () => isActive = true;
-window.onblur = () => isActive = false;
+// RECEIVE
+socket.onmessage = function(e) {
+    const data = JSON.parse(e.data);
 
-// SEND MESSAGE
+    const isMe = data.sender_id == {{ request.user.id }};
+
+    const div = document.createElement("div");
+    div.className = "mb-2 " + (isMe ? "text-end" : "");
+
+    div.innerHTML = `
+        <div class="d-inline-block px-3 py-2 rounded
+            ${isMe ? 'bg-dark text-white' : 'bg-light'}">
+            ${data.message}
+        </div>
+    `;
+
+    chatBox.appendChild(div);
+    chatBox.scrollTop = chatBox.scrollHeight;
+};
+
+// SEND
 form.addEventListener("submit", function(e) {
     e.preventDefault();
 
-    const message = input.value.trim();
-    if (!message) return;
+    const msg = input.value.trim();
+    if (!msg) return;
 
-    fetch("", {
-        method: "POST",
-        headers: {
-            "X-CSRFToken": getCSRFToken(),
-            "Content-Type": "application/x-www-form-urlencoded"
-        },
-        body: `content=${encodeURIComponent(message)}`
-    })
-    .then(res => res.text())
-    .then(() => {
-        input.value = "";
-        loadMessages(true); // force refresh after send
-    })
-    .catch(err => console.error("Send failed:", err));
+    socket.send(JSON.stringify({ message: msg }));
+
+    input.value = "";
 });
-
-// LOAD MESSAGES (SMART POLLING)
-function loadMessages(force=false) {
-    if (!isActive && !force) return;
-
-    fetch("/messages/fetch/{{ conversation.id }}/")
-    .then(res => res.json())
-    .then(data => {
-
-        // 🚀 skip update if nothing new
-        if (!force && data.last_id === lastMessageId) {
-            return;
-        }
-
-        lastMessageId = data.last_id;
-
-        let html = "";
-
-        data.messages.forEach(msg => {
-            html += `
-            <div data-id="${msg.id}" class="mb-2 ${msg.is_me ? 'text-end' : ''}">
-                <div class="d-inline-block px-3 py-2 rounded
-                    ${msg.is_me ? 'bg-dark text-white' : 'bg-light'}">
-                    ${msg.content}
-                </div>
-            </div>
-            `;
-        });
-
-        chatBox.innerHTML = html;
-        chatBox.scrollTop = chatBox.scrollHeight;
-    })
-    .catch(err => console.error("Load failed:", err));
-}
-
-// INITIAL LOAD
-loadMessages(true);
-
-// SMART POLLING (LESS AGGRESSIVE)
-setInterval(() => loadMessages(), 5000);
-
 </script>
 
 {% endblock %}
