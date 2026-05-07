@@ -9,4 +9,5 @@ urlpatterns = [
     path("inbox/", views.inbox, name="inbox"),
     path("chat/<int:conversation_id>/", views.chat, name="chat"),
     path("fetch/<int:conversation_id>/", views.fetch_messages, name="fetch_messages"),
+    path("inbox-updates/", views.inbox_updates, name="inbox_updates"),
 ]

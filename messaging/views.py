@@ -135,22 +135,48 @@ def fetch_messages(request, conversation_id):
     ).first()
 
     if not conversation:
-        return JsonResponse({"error": "Unauthorized"}, status=403)
+        return JsonResponse({"error": "unauthorized"}, status=403)
 
-    messages = conversation.messages.order_by("created_at")
+    last_id = int(request.GET.get("last_id", 0))
+
+    messages_qs = conversation.messages.filter(
+        id__gt=last_id
+    ).order_by("id")
 
     data = []
-    last_id = 0
 
-    for msg in messages:
+    for msg in messages_qs:
         data.append({
             "id": msg.id,
             "content": msg.content,
             "is_me": msg.sender == request.user
         })
-        last_id = msg.id
 
     return JsonResponse({
         "messages": data,
-        "last_id": last_id
+        "last_id": data[-1]["id"] if data else last_id
     })
+
+@login_required
+def inbox_updates(request):
+    user = request.user
+
+    conversations = Conversation.objects.filter(participants=user)
+
+    data = []
+
+    for convo in conversations:
+
+        last_message = convo.messages.order_by("-id").first()
+
+        unread_count = convo.messages.exclude(sender=user).filter(
+            id__gt=request.GET.get(f"last_read_{convo.id}", 0)
+        ).count()
+
+        data.append({
+            "conversation_id": convo.id,
+            "unread": unread_count,
+            "last_message": last_message.content if last_message else "",
+        })
+
+    return JsonResponse({"conversations": data})

@@ -55,7 +55,11 @@ MK {{ convo.property.price }}
 
 <!-- UNREAD BADGE -->
 {% if convo.unread_count > 0 %}
-<span class="me-2" style="width:8px; height:8px; background:#0d6efd; border-radius:50%; display:inline-block;"></span>
+<span class="badge bg-primary"
+      id="unread-{{ convo.id }}"
+      style="{% if convo.unread_count == 0 %}display:none{% endif %}">
+    {{ convo.unread_count }}
+</span>
 {% endif %}
 </div>
 
@@ -75,5 +79,75 @@ MK {{ convo.property.price }}
 {% endfor %}
 
 </div>
+
+<script>
+let inboxState = {};
+
+function getCSRFToken() {
+    return document.cookie.split('; ')
+        .find(row => row.startsWith('csrftoken'))
+        ?.split('=')[1];
+}
+
+function updateInbox() {
+    fetch("/messages/inbox-updates/")
+        .then(res => res.json())
+        .then(data => {
+
+            data.conversations.forEach(convo => {
+
+                inboxState[convo.conversation_id] = convo.unread;
+
+                const badge = document.getElementById(
+                    `unread-${convo.conversation_id}`
+                );
+
+                if (badge) {
+                    if (convo.unread > 0) {
+                        badge.innerText = convo.unread;
+                        badge.style.display = "inline-block";
+                    } else {
+                        badge.style.display = "none";
+                    }
+                }
+            });
+
+        });
+}
+
+// poll inbox every 5s
+setInterval(updateInbox, 2500);
+updateInbox();
+
+
+let lastMessageId = 0;
+
+function loadMessages() {
+    fetch(`/messages/fetch/{{ conversation.id }}/?last_id=${lastMessageId}`)
+        .then(res => res.json())
+        .then(data => {
+
+            data.messages.forEach(msg => {
+                chatBox.innerHTML += `
+                    <div class="mb-2 ${msg.is_me ? 'text-end' : ''}">
+                        <div class="d-inline-block px-3 py-2 rounded
+                            ${msg.is_me ? 'bg-dark text-white' : 'bg-light'}">
+                            ${msg.content}
+                        </div>
+                    </div>
+                `;
+            });
+
+            if (data.last_id) {
+                lastMessageId = data.last_id;
+            }
+
+            chatBox.scrollTop = chatBox.scrollHeight;
+        });
+}
+
+setInterval(loadMessages, 2500);
+
+</script>
 
 {% endblock %}
