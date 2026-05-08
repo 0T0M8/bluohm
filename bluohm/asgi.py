@@ -1,14 +1,23 @@
 import os
-from django.core.asgi import get_asgi_application
-from channels.routing import ProtocolTypeRouter, URLRouter
-from channels.auth import AuthMiddlewareStack
-import messaging.routing
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "bluohm.settings")
 
-application = ProtocolTypeRouter({
-    "http": get_asgi_application(),
+from django.core.asgi import get_asgi_application
 
+django_asgi_app = get_asgi_application()
+
+from channels.auth import AuthMiddlewareStack
+from channels.routing import ProtocolTypeRouter, URLRouter
+
+import messaging.routing
+
+
+application = ProtocolTypeRouter({
+
+    # Traditional Django HTTP
+    "http": django_asgi_app,
+
+    # WebSocket support
     "websocket": AuthMiddlewareStack(
         URLRouter(
             messaging.routing.websocket_urlpatterns

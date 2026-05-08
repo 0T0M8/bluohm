@@ -1,69 +1,70 @@
-<!-- templates/messaging/inbox.html -->
-
 {% extends "base.html" %}
 {% block content %}
 
 <div class="container py-4">
 
-<h4 class="mb-4">
-<i class="bi bi-chat-dots"></i> Messages
-</h4>
+<!-- HEADER -->
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h4 class="mb-0">
+        <i class="bi bi-chat-dots"></i> Messages
+    </h4>
+</div>
 
+<!-- CONVERSATIONS -->
 {% for convo in conversations %}
 
 <a href="{% url 'messaging:chat' convo.id %}"
    class="text-decoration-none text-dark">
 
-<div class="card mb-3 shadow-sm">
+<div class="card mb-3 shadow-sm inbox-card">
 
-<div class="card-body d-flex justify-content-between align-items-center">
+    <div class="card-body d-flex justify-content-between align-items-center">
 
-<div>
+        <!-- LEFT SIDE -->
+        <div class="flex-grow-1">
 
-<!-- TITLE -->
-<h6 class="mb-1 {% if convo.unread_count > 0 %}fw-bold{% endif %}">
-{{ convo.property.title }}
-</h6>
+            <!-- TITLE -->
+            <h6 class="mb-1 {% if convo.unread_count > 0 %}fw-bold{% endif %}">
+                {{ convo.property.title }}
+            </h6>
 
-<!-- LAST MESSAGE -->
-<p class="mb-1 text-muted">
-{% if convo.last_message %}
-    {{ convo.last_message.content|truncatechars:40 }}
-{% else %}
-    <span class="text-muted">No messages yet</span>
-{% endif %}
-</p>
+            <!-- LAST MESSAGE -->
+            <p class="mb-1 text-muted small">
+                {% if convo.last_message %}
+                    {{ convo.last_message.content|truncatechars:45 }}
+                {% else %}
+                    <span class="text-muted">No messages yet</span>
+                {% endif %}
+            </p>
 
-<!-- PRICE -->
-<small class="text-muted">
-MK {{ convo.property.price }}
-</small>
+            <!-- PRICE -->
+            <small class="text-muted">
+                MK {{ convo.property.price }}
+            </small>
 
-</div>
+        </div>
 
-<!-- RIGHT SIDE -->
-<div class="text-end">
+        <!-- RIGHT SIDE -->
+        <div class="text-end ms-3">
 
-<!-- TIME -->
-<small class="text-muted d-block">
-{{ convo.last_message.created_at|timesince }} ago
-</small>
+            <!-- TIME -->
+            <small class="text-muted d-block">
+                {% if convo.last_message %}
+                    {{ convo.last_message.created_at|timesince }} ago
+                {% endif %}
+            </small>
 
-<!-- SEEN INDICATOR 
-<small class="text-muted">Seen</small>
--->
+            <!-- UNREAD BADGE -->
+            {% if convo.unread_count > 0 %}
+            <span class="badge bg-primary mt-2"
+                  id="unread-{{ convo.id }}">
+                {{ convo.unread_count }}
+            </span>
+            {% endif %}
 
-<!-- UNREAD BADGE -->
-{% if convo.unread_count > 0 %}
-<span class="badge bg-primary"
-      id="unread-{{ convo.id }}"
-      style="{% if convo.unread_count == 0 %}display:none{% endif %}">
-    {{ convo.unread_count }}
-</span>
-{% endif %}
-</div>
+        </div>
 
-</div>
+    </div>
 
 </div>
 
@@ -72,42 +73,85 @@ MK {{ convo.property.price }}
 {% empty %}
 
 <div class="text-center py-5">
-<h5>No messages yet</h5>
-<p class="text-muted">Start a conversation from a property</p>
+    <h5>No messages yet</h5>
+    <p class="text-muted">
+        Start a conversation from a property listing
+    </p>
 </div>
 
 {% endfor %}
 
 </div>
 
+<!-- ============================= -->
+<!-- REAL-TIME INBOX UPDATES -->
+<!-- ============================= -->
+
 <script>
-function updateInbox() {
+function getCSRFToken() {
+    return document.cookie.split('; ')
+        .find(row => row.startsWith('csrftoken'))
+        ?.split('=')[1];
+}
+
+/**
+ * Updates only unread badges (no full reload)
+ */
+function updateInbox(conversations) {
+
+    conversations.forEach(convo => {
+
+        const badge = document.getElementById(`unread-${convo.conversation_id}`);
+
+        if (!badge) return;
+
+        if (convo.unread > 0) {
+            badge.innerText = convo.unread;
+            badge.style.display = "inline-block";
+        } else {
+            badge.style.display = "none";
+        }
+    });
+}
+
+/**
+ * Fallback polling (works even without websocket)
+ */
+function pollInbox() {
     fetch("/messages/inbox-updates/")
         .then(res => res.json())
         .then(data => {
-
-            data.conversations.forEach(convo => {
-
-                const badge = document.getElementById(
-                    `unread-${convo.conversation_id}`
-                );
-
-                if (!badge) return;
-
-                if (convo.unread > 0) {
-                    badge.innerText = convo.unread;
-                    badge.style.display = "inline-block";
-                } else {
-                    badge.style.display = "none";
-                }
-            });
-
+            updateInbox(data.conversations);
         })
-        .catch(err => console.error("Inbox update failed:", err));
+        .catch(err => console.error("Inbox polling error:", err));
 }
 
-setInterval(updateInbox, 3000);
-updateInbox();
+/**
+ * WebSocket (real-time trigger)
+ */
+const inboxSocket = new WebSocket(
+    (window.location.protocol === "https:" ? "wss://" : "ws://")
+    + window.location.host
+    + "/ws/inbox/"
+);
+
+inboxSocket.onmessage = function(e) {
+    const data = JSON.parse(e.data);
+
+    if (data.type === "inbox_update") {
+        pollInbox(); // refresh only changed state
+    }
+};
+
+inboxSocket.onclose = function() {
+    console.warn("Inbox websocket closed — falling back to polling");
+};
+
+/**
+ * Start polling fallback
+ */
+pollInbox();
+setInterval(pollInbox, 5000);
 </script>
 
 {% endblock %}

@@ -4,6 +4,9 @@ from channels.db import database_sync_to_async
 from .models import Conversation, Message
 
 
+# =========================
+# CHAT CONSUMER
+# =========================
 class ChatConsumer(AsyncWebsocketConsumer):
 
     async def connect(self):
@@ -16,7 +19,10 @@ class ChatConsumer(AsyncWebsocketConsumer):
             await self.close()
             return
 
-        if not await self.user_in_conversation(user):
+        self.user = user
+
+        allowed = await self.user_in_conversation(user)
+        if not allowed:
             await self.close()
             return
 
@@ -40,10 +46,12 @@ class ChatConsumer(AsyncWebsocketConsumer):
         if not message:
             return
 
-        user = self.scope["user"]
+        user = self.user
 
+        # 1. SAVE MESSAGE (ONLY ONCE)
         msg_obj = await self.save_message(user, message)
 
+        # 2. BROADCAST TO CHAT ROOM
         await self.channel_layer.group_send(
             self.room_group_name,
             {
@@ -53,37 +61,43 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 "message_id": msg_obj.id,
             }
         )
-        # after saving message
-        msg = await self.save_message(user, message)
 
-        # find recipient
+        # 3. NOTIFY INBOX USERS
         recipient_id = await self.get_other_user_id(user)
 
-        # notify recipient inbox
         await self.channel_layer.group_send(
             f"user_{recipient_id}",
             {
-            "type": "inbox.update"
+                "type": "inbox.update",
+                "conversation_id": self.conversation_id
             }
         )
-        @database_sync_to_async
-        def get_other_user_id(self, user):
-        convo = Conversation.objects.get(id=self.conversation_id)
 
-        return convo.participants.exclude(id=user.id).first().id
+        # also notify sender (for multi-tab sync)
+        await self.channel_layer.group_send(
+            f"user_{user.id}",
+            {
+                "type": "inbox.update",
+                "conversation_id": self.conversation_id
+            }
+        )
 
-        async def chat_message(self, event):
+    async def chat_message(self, event):
         await self.send(text_data=json.dumps(event))
 
-        @database_sync_to_async
-        def user_in_conversation(self, user):
+    # =========================
+    # DB HELPERS
+    # =========================
+
+    @database_sync_to_async
+    def user_in_conversation(self, user):
         return Conversation.objects.filter(
             id=self.conversation_id,
             participants=user
         ).exists()
 
-        @database_sync_to_async
-        def save_message(self, user, message):
+    @database_sync_to_async
+    def save_message(self, user, message):
         convo = Conversation.objects.get(id=self.conversation_id)
 
         return Message.objects.create(
@@ -92,6 +106,15 @@ class ChatConsumer(AsyncWebsocketConsumer):
             content=message
         )
 
+    @database_sync_to_async
+    def get_other_user_id(self, user):
+        convo = Conversation.objects.get(id=self.conversation_id)
+        return convo.participants.exclude(id=user.id).first().id
+
+
+# =========================
+# INBOX CONSUMER
+# =========================
 class InboxConsumer(AsyncWebsocketConsumer):
 
     async def connect(self):
@@ -101,6 +124,7 @@ class InboxConsumer(AsyncWebsocketConsumer):
             await self.close()
             return
 
+        self.user = user
         self.group_name = f"user_{user.id}"
 
         await self.channel_layer.group_add(
@@ -117,9 +141,7 @@ class InboxConsumer(AsyncWebsocketConsumer):
         )
 
     async def inbox_update(self, event):
-        """
-        This is triggered by backend when new message arrives
-        """
         await self.send(text_data=json.dumps({
-            "type": "inbox_update"
+            "type": "inbox_update",
+            "conversation_id": event.get("conversation_id")
         }))
