@@ -43,45 +43,41 @@ def start_conversation(request, property_id):
 @login_required
 def chat(request, conversation_id):
 
-    conversation = Conversation.objects.filter(
-        id=conversation_id,
-        participants=request.user
-    ).first()
+    conversation = get_object_or_404(
+        Conversation,
+        id=conversation_id
+    )
 
-    if not conversation:
+    # SECURITY
+    if request.user not in conversation.participants.all():
         return redirect("messaging:inbox")
 
-    # ✅ MARK AS READ
-    read_state, _ = ConversationReadState.objects.get_or_create(
+    # MARK READ
+    read_state, created = ConversationReadState.objects.get_or_create(
         user=request.user,
         conversation=conversation
     )
+
     read_state.last_read_at = timezone.now()
     read_state.save()
+    
+    from asgiref.sync import async_to_sync
+    from channels.layers import get_channel_layer
 
-    # ✅ SEND MESSAGE (AJAX SAFE)
-    if request.method == "POST":
-        content = request.POST.get("content")
+    channel_layer = get_channel_layer()
 
-        if content:
-            msg = Message.objects.create(
-                conversation=conversation,
-                sender=request.user,
-                content=content
-            )
-
-            return JsonResponse({
-                "status": "sent",
-                "message_id": msg.id
-            })
-
+    async_to_sync(channel_layer.group_send)(
+        f"user_{request.user.id}",
+        {
+            "type": "inbox.update"
+        }
+    )
     messages = conversation.messages.order_by("created_at")
 
     return render(request, "messaging/chat.html", {
         "conversation": conversation,
         "messages": messages
-    })
-
+    })   
 
 # ================================
 # INBOX

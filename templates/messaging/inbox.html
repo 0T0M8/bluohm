@@ -138,8 +138,8 @@ const inboxSocket = new WebSocket(
 inboxSocket.onmessage = function(e) {
     const data = JSON.parse(e.data);
 
-    if (data.type === "inbox_update") {
-        pollInbox(); // refresh only changed state
+    if (data.type === "inbox_update" && document.visibilityState === "visible") {
+        pollInbox();
     }
 };
 
