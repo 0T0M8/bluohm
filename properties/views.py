@@ -10,6 +10,7 @@ def add_property(request):
     if request.method == "POST":
         title = request.POST.get("title")
         price = request.POST.get("price")
+        listing_type = request.POST.get("listing_type")
         bedrooms = request.POST.get("bedrooms")
         bathrooms = request.POST.get("bathrooms")
         location = request.POST.get("location")
@@ -20,6 +21,7 @@ def add_property(request):
             owner=request.user,
             title=title,
             price=price,
+            listing_type=listing_type,
             bedrooms=bedrooms,
             bathrooms=bathrooms,
             location=location,

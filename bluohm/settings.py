@@ -26,7 +26,7 @@ SECRET_KEY = "django-insecure-sdvq#g&!p9z%uhqb%!p&dec@o&bc2v2x6#5+k!%5+5vecjg*@#
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1']
+ALLOWED_HOSTS = ["192.168.1.195", "localhost", "127.0.0.1"]
 DEFAULT_FROM_EMAIL = "noreply@bluohm.local"
 
 # Application definition
@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "django.contrib.humanize",
 
     'accounts',
     'properties',

@@ -64,6 +64,7 @@ void rmbk(char *searchstr) {
 }
 
 int main () {
+ mkbk("Turbo C++", 578);
  mkbk("The Fault in Our Stars", 367);
  mkbk("Stollen", 477);
  mkbk("The Boy Who Harnessed the Wind", 730);
@@ -73,8 +74,9 @@ int main () {
  mkbk("The Diary of Anne Frank", 355);
  mkbk("Circles of Gold", 730);
  mkbk("Kane & Abel", 730);
- mkbk("Astra and Hugo", 412);
+ mkbk("Tug of War", 412);
  mkbk("Around the World in 80 Days", 210);
+ mkbk("Rogue Male", 301);
  mkbk("5 months in a Balloon", 635);
  
  printf("BookCount: %d", numbks);

@@ -1,6 +1,7 @@
 <!-- templates/marketplace/index.html -->
 
 {% extends "base.html" %}
+{% load humanize %}
 
 {% block content %}
 
@@ -114,14 +115,14 @@
 <div class="card-body">
 
 <div class="price">
-    MK {{ property.price }}
+    MK {{ property.price|intcomma }}
 </div>
 
 <h6>{{ property.title }}</h6>
 
 <div class="location">
-    <i class="bi bi-geo-alt"></i>
-    {{ property.city }}, {{ property.area }}
+    <i class="bi bi-geo-alt-fill me-1"></i>
+    {{ property.location }}
 </div>
 
 <div class="features mt-2">

@@ -114,6 +114,16 @@ body.light-mode input, body.light-mode select, body.light-mode textarea {
             </div>
 
             <div class="mb-3">
+                <label class="form-label">Listing Type</label>
+
+                <select name="listing_type" class="form-select" required>
+                  <option value="">Select listing type</option>
+                  <option value="rent">Rent</option>
+                  <option value="sale">Sale</option>
+                </select>
+            </div>
+
+            <div class="mb-3">
                 <label class="form-label">Bedrooms</label>
                 <input type="number" name="bedrooms" placeholder="Number of bedrooms" required>
             </div>
